@@ -1,4 +1,4 @@
-LDIR = ../lib
+LDIR = ../headers
 CC = gcc
 CFLAGS = -I$(LDIR)
 
