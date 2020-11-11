@@ -9,7 +9,6 @@
 #define HIGH 1
 #define LOW 0
 
-int g_i = 0;
 
 void setUpBoard(){
     setUpPin(A);setPinOut(A);
