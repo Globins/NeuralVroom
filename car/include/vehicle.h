@@ -4,9 +4,9 @@
 #include "wheelPair.h"
 #include "obstacleGrid.h"
 
-#define DUTY 150
+#define DUTY 155
 #define SPEED 29.0
-#define TURN_CONST 70
+#define TURN_CONST 80
 
 
 struct Vehicle{
