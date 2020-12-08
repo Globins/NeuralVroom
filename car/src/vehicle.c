@@ -16,8 +16,11 @@ struct Vehicle* setUpVehicle(unsigned leftWheel[], unsigned rightWheel[], unsign
 }
 
 void turnRight(struct Vehicle* vehicle, double turnAngle){
-    unsigned leftSpeed = SPEED-TURN_CONST*turnAngle;
-    unsigned rightSpeed = SPEED+TURN_CONST*turnAngle;
+    unsigned leftSpeed = DUTY-TURN_CONST*turnAngle;
+    unsigned rightSpeed = DUTY+TURN_CONST*turnAngle;
+    printf("\tleftSpeed: %d\n", leftSpeed);
+    printf("\trightSpeed: %d\n", rightSpeed);
+    printf("\tturnAngle: %f\n", turnAngle);
     setSpeed(vehicle->leftWheels, leftSpeed);
     setSpeed(vehicle->rightWheels, rightSpeed);
 }
@@ -25,6 +28,9 @@ void turnRight(struct Vehicle* vehicle, double turnAngle){
 void turnLeft(struct Vehicle* vehicle, double turnAngle){
     unsigned leftSpeed = DUTY+TURN_CONST*turnAngle;
     unsigned rightSpeed = DUTY-TURN_CONST*turnAngle;
+    printf("\tleftSpeed: %d\n", leftSpeed);
+    printf("\trightSpeed: %d\n", rightSpeed);
+    printf("\tturnAngle: %f\n", turnAngle);
     setSpeed(vehicle->leftWheels, leftSpeed);
     setSpeed(vehicle->rightWheels, rightSpeed);
 }
@@ -35,7 +41,7 @@ void stop(struct Vehicle* vehicle){
 }
 
 void move(struct Vehicle* vehicle, int dist,  double orientation, int isFoward){
-    double time =(dist/SPEED);
+    double time =(dist/(double)SPEED);
     if(isFoward){
         setDirectionFoward(vehicle->leftWheels);
         setDirectionFoward(vehicle->rightWheels);
@@ -88,8 +94,8 @@ void move(struct Vehicle* vehicle, int dist,  double orientation, int isFoward){
             }
         }
     }
-    printf("move %lf\n", time);
-    vehicle->orientation = orientation;
+    
+    printf("\tmove %lf\n", time);
     time_sleep(time);
 }
 
