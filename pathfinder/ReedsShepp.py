@@ -1,4 +1,3 @@
-import import_ipynb #Allows you to import ipynb files
 from .vehicle import *
 from .utils import *
 

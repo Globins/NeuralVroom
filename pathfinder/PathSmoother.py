@@ -92,6 +92,8 @@ class PathSmoother:
                 deltay = currentPath[i+1].position[1] - currentPath[i-1].position[1]
                 deltax = currentPath[i+1].position[0] - currentPath[i-1].position[0]
                 currentPath[i].orientation = np.arctan2(deltay,deltax)
+                if(currentPath[i].gear == Gear.Backward):
+                    currentPath[i].orientation -= np.pi
                 if(currentPath[i].orientation < 0):
                     currentPath[i].orientation += 2*np.pi
                 elif(currentPath[i].orientation > 2*np.pi):

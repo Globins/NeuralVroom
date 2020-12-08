@@ -51,7 +51,6 @@ class HybridAStarNode:
     def __repr__(self):
         return 'Point(x=%s, y=%s, ori=%s, rev=%s)' % (self.cell.col, self.cell.row, np.rad2deg(self.cell.ori), self.cell.rev)
 
-
 #This will implement the basic A* Algorithm
 class HybridAStar:
     #class variables
@@ -166,7 +165,7 @@ class HybridAStar:
                 for nextNode in nextNodes:
                     nextNode.parent = current_node
                     nextNode.cell = self.statetoCell(nextNode.vehicleState)
-                    v = voro[nextNode.cell.col][nextNode.cell.row]
+                    v = voro[nextNode.cell.row][nextNode.cell.col]
                     if(nextNode.rsPath):
                         nextNode.g = self.CalculateRSCost(nextNode.rsPath, 1, 1, 1)
                     else:
