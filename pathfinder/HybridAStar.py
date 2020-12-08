@@ -2,10 +2,10 @@ from queue import PriorityQueue
 from dataclasses import dataclass
 import random
 
-from reedsshepp import *
-from vehicle import *
-from Grid import Grid
-from utils import *
+from .ReedsShepp import *
+from .vehicle import *
+from .Grid import Grid
+from .utils import *
 
 @dataclass
 class Cell:

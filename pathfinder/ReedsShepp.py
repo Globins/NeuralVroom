@@ -1,6 +1,6 @@
 import import_ipynb #Allows you to import ipynb files
-from vehicle import *
-from utils import *
+from .vehicle import *
+from .utils import *
 
 class ReedsSheppAction:
     """Represents a single action within a path from point A to B"""

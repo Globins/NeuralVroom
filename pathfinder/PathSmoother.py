@@ -1,7 +1,7 @@
 import numpy as np
-from vehicle import *
-from Grid import Grid
-from utils import *
+from .vehicle import *
+from .Grid import Grid
+from .utils import *
 
 
 # In[46]:

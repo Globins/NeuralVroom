@@ -1,6 +1,6 @@
 from enum import Enum
 import numpy as np
-from utils import *
+from .utils import *
 
 class Gear(Enum):
     """Gear is a enum that returns a bool of whether the car is backwards or forwards"""

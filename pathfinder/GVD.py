@@ -1,6 +1,6 @@
 from queue import PriorityQueue
 import math
-from utils import *
+from .utils import *
 
 
 #Generates and outptus a usable Generalized Voronoi Diagram Based on 

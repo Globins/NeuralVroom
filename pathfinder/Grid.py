@@ -1,7 +1,6 @@
-from vehicle import *
-from GVD import GVD
-from utils import *
-from vehicle import Vehicle
+from .vehicle import *
+from .GVD import GVD
+from .utils import *
 
 #initialize the grid with a specified size for a grid, does not need to be uniform
 #set up obstacles using the addobstacle and removeobstacle
