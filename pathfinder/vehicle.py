@@ -16,8 +16,7 @@ class Steer(Enum):
 class VehicleState:
     """Vehicle state of the simulated vehicle, keeps track of the vehicles current position,
     orientation (in radians), angle of the wheels, and gear, NONDISCRETE MEASUREMENTS"""
-    def __init__(self, position:tuple = (0, 0), orientation:float = 0.0, wheelAngle:float = 0.0, 
-                 gear:Gear=Gear.Forward):
+    def __init__(self, position:tuple = (0, 0), orientation:float = 0.0, gear:Gear=Gear.Forward, wheelAngle:float = 0.0):
         self.position = position
         self.orientation = orientation
         self.wheelAngle = wheelAngle
@@ -34,7 +33,7 @@ class VehicleState:
 class Vehicle:
     """Keeps track of vehicular statistics and holds functions for VehicleState
     ALL MEASUREMENTS IN CM, ALL MEASURMENTS ARE NONDISCRETE"""
-    def __init__(self, size:tuple=(0,0), maxCarTurnAngle:float=33.75):
+    def __init__(self, size:tuple=(0,0), maxCarTurnAngle:float=33.75, velocity:float= 1):
         self.width = size[0]
         self.length = size[1]
         
@@ -44,7 +43,7 @@ class Vehicle:
         self.maxCarTurnAngle = maxCarTurnAngle #in Degrees
         self.turnRadius = 1#np.sin(self.maxCarTurnAngle)*self.length
         
-        self.velocity = 1 #cm/s => 1 mph
+        self.velocity = velocity
 
     def getNextState(self, current:VehicleState, steer:Steer, gear:Gear, dt:float):
         """returns next state based on current vehicle state"""
@@ -65,5 +64,5 @@ class Vehicle:
             x = -x
             angle = -angle
         correctPos = rotate((x,y), current.orientation)
-        return VehicleState(tuple(np.add(current.position, correctPos)), current.orientation + angle, 0.0, gear), length
+        return VehicleState(tuple(np.add(current.position, correctPos)), current.orientation + angle, gear), length
 

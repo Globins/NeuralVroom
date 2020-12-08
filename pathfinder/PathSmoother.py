@@ -3,10 +3,6 @@ from .vehicle import *
 from .Grid import Grid
 from .utils import *
 
-
-# In[46]:
-
-
 class PathSmoother:
     """Will take a path list and use gradient descent to smooth it out"""
     #smoothing based on http://ai.stanford.edu/~ddolgov/papers/dolgov_gpp_stair08.pdf
@@ -28,7 +24,7 @@ class PathSmoother:
         self._kMax = 1
         
     #path == states
-    def smooth(self, path, grid):
+    def smooth(self, path, grid, notsafe=[]):
         voro = grid.returnVoroDistanceMap()
         obst = grid.returnDistanceMap()
         if(len(path) < 5):
@@ -46,6 +42,7 @@ class PathSmoother:
                 if (currentPath[i - 1].gear != currentPath[i].gear): continue
                 if (currentPath[i].gear != currentPath[i + 1].gear): continue
                 if (currentPath[i + 1].gear != currentPath[i + 2].gear): continue
+                if(i in notsafe): continue
                 
                 currentPosition = currentPath[i].position
                 correction = (0,0)
@@ -97,15 +94,42 @@ class PathSmoother:
                 currentPath[i].orientation = np.arctan2(deltay,deltax)
                 if(currentPath[i].orientation < 0):
                     currentPath[i].orientation += 2*np.pi
+                elif(currentPath[i].orientation > 2*np.pi):
+                    currentPath[i].orientation -= 2*np.pi
                 change += correction[0]**2 + correction[1]**2
                 
             count += 1
             
         smoothPath = []
+        deltay = currentPath[2].position[1] - currentPath[0].position[1]
+        deltax = currentPath[2].position[0] - currentPath[0].position[0]
         
+        deltay1 = currentPath[len(currentPath)-1].position[1] - currentPath[len(currentPath)-3].position[1]
+        deltax1 = currentPath[len(currentPath)-1].position[0] - currentPath[len(currentPath)-3].position[0]
+        currentPath[1].orientation = np.arctan2(deltay,deltax)
+        currentPath[len(currentPath)-2].orientation = np.arctan2(deltay1,deltax1)
+        
+        if(currentPath[1].orientation < 0):
+            currentPath[1].orientation += 2*np.pi
+        elif(currentPath[1].orientation > 2*np.pi):
+            currentPath[1].orientation -= 2*np.pi
+            
+        if(currentPath[len(currentPath)-2].orientation < 0):
+            currentPath[len(currentPath)-2].orientation += 2*np.pi
+        elif(currentPath[len(currentPath)-2].orientation > 2*np.pi):
+            currentPath[len(currentPath)-2].orientation -= 2*np.pi
+        
+        notsafe = []
+        for i in range(len(currentPath)):
+            if(not grid.IsSafe(currentPath[i], 1.1)):
+                notsafe.append(i)
+        if(len(notsafe)):
+            currentPath = self.smooth(path, grid, notsafe)
         for segment in currentPath:
             smoothPath.append(segment)
         return smoothPath
+    
+    
     def curvatureTerm(self, xim1, xi, xip1):
         dxi = (xi[0] - xim1[0], xi[1] - xim1[1])
         distdxi = dxi[0]**2 + dxi[1]**2

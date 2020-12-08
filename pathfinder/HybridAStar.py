@@ -52,9 +52,6 @@ class HybridAStarNode:
         return 'Point(x=%s, y=%s, ori=%s, rev=%s)' % (self.cell.col, self.cell.row, np.rad2deg(self.cell.ori), self.cell.rev)
 
 
-# In[13]:
-
-
 #This will implement the basic A* Algorithm
 class HybridAStar:
     #class variables
@@ -124,7 +121,7 @@ class HybridAStar:
         return np.sqrt(((current.vehicleState.position[0] - destination.vehicleState.position[0]) ** 2 + (current.vehicleState.position[1] - destination.vehicleState.position[1]) ** 2))
     
     #gets all neighbors at current node
-    def GetNextNodes(self, current_state:VehicleState, gear, end:VehicleState):
+    def GetNextNodes(self, current_state:VehicleState, gear:Gear, end:VehicleState):
         nodes = []
         for steer in self._vehicle.steers:
             newVehicleState, length = self._vehicle.getNextState(current_state, steer, gear, 1)
@@ -185,4 +182,3 @@ class HybridAStar:
                         
         print("NO PATH FOUND")
         return self.GeneratePath(start_node)
-
