@@ -48,6 +48,8 @@ void setDirectionStop(struct WheelPair* wheels){
 void setSpeed(struct WheelPair* wheels, unsigned dutyCycle){
     if(dutyCycle > 255)
         dutyCycle = 255;
+    else if(dutyCycle < 0)
+        dutyCycle = 0;
     gpioPWM(wheels->pwm, dutyCycle);
     wheels->dutyCycle = dutyCycle;
 }
