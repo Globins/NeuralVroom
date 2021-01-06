@@ -1,0 +1,25 @@
+NeuralVroom
+	- Car (c)
+		-Stepper controls
+	
+	- main (C++)
+	- vehicle (C++)
+	- gvd (C++)
+	- grid (C++)
+
+	- Pathfinder (c++)
+		-HAS
+		-smoother
+		-reedsshepp
+		-utils_pf
+
+	- PathRouter (python)
+		- Routing
+
+	- Output files:
+		PATH: VEHICLEID - Will Update/be created every time Pathfinding/Routing finishes
+			(X, Y, Steer, Gear)
+		GRIDINFO - Will update every time Update is called on Grid
+			Distance, Voronoi Maps
+			ObstacleList
+
