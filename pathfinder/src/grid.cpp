@@ -61,7 +61,21 @@ vector<vector<bool>> Grid::returnVoroMap()
     }
     return result;
 }
-bool Grid::isSafe(float safetyFactor)
+vector<vector<Coordinates2D>> Grid::returnNearest()
+{
+    vector<vector<Coordinates2D>> result;
+    for (auto row = voroDistMap.begin(); row != voroDistMap.end(); row++) {
+        vector<Coordinates2D> pushRow;
+        for (auto col = row->begin(); col != row->end(); col++) 
+        {
+            Cell *cell = *col;
+            pushRow.push_back(Coordinates2D{(float)cell->nearestX, (float)cell->nearestY});
+        }
+        result.push_back(pushRow);
+    }
+    return result;
+}
+bool Grid::isSafe(VehicleState state, float safetyFactor)
 {
     return false;
 }

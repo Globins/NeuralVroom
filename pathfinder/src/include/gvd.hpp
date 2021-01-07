@@ -5,7 +5,6 @@
 #include <queue>
 #include <limits>
 #include <functional>
-#include <cmath>
 
 struct Cell
 {
@@ -37,7 +36,6 @@ private:
   int width;
   int height;
 
-    //queue = (distance, (x,y))
   priority_queue<Cell*, vector<Cell*>, comparator> distOpen;
   priority_queue<Cell*, vector<Cell*>, comparator> voroOpen;
 
@@ -54,12 +52,14 @@ private:
   void updateVoro();
   void raiseVoro(Cell* s_cell);
   void lowerVoro(Cell* s_cell);
+
   void chkVoro(Cell* s_cell, Cell* n_cell);
+  
 public:
   vector<vector<bool>> voro;
   vector<vector<int>> comp;
 
-  vector<vector<int>> cost;
+  vector<vector<float>> cost;
   vector<vector<Cell*>> distMap; 
   vector<vector<Cell*>> voroDistMap;
 };

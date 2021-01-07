@@ -1,7 +1,7 @@
 #include "include/gvd.hpp"
 //http://www.first-mm.eu/files/lau10iros.pdf
 
-//VORO NOT WORKING FULLY YET
+
 GVD::GVD(int x_length, int y_length)
 {
   width = y_length;
@@ -10,7 +10,6 @@ GVD::GVD(int x_length, int y_length)
   voroDistMap.resize(width,vector<Cell*>(height));
   for(int i = 0; i < width; i++)
   {
-    vector<Cell*> cellRow;
     for(int q = 0; q < height; q++)
     {   
         distMap[i][q] = new Cell();
@@ -25,7 +24,7 @@ GVD::GVD(int x_length, int y_length)
   voro.resize(width,vector<bool>(height, false));
   comp.resize(width,vector<int>(height, -1));
 
-  cost.resize(width,vector<int>(height, numeric_limits<int>::max()));
+  cost.resize(width,vector<float>(height, numeric_limits<float>::max()));
 }
 
 void GVD::update()
@@ -85,12 +84,12 @@ bool GVD::isUnknown(int x, int y)
 {
   return (x < 0 || y < 0) || (x > width || y > height);
 }
-
 void GVD::updateDist()
 {
   while(distOpen.size())
   {
     auto current = distOpen.top();
+    distOpen.pop();
     if(current->toProcess)
     {
       if(current->toRaise)
@@ -100,12 +99,11 @@ void GVD::updateDist()
       else if(isOccupied(current->nearestX, current->nearestY, false))
       {
         voro[current->x][current->y] = false;
-        //unsetCell(current->x, current->y, true);
+        unsetCell(current->x, current->y, true);
         current->toProcess = false;
         lowerDist(current);
       }
     }
-    distOpen.pop();
   }
 }
 void GVD::updateVoro()
@@ -113,6 +111,7 @@ void GVD::updateVoro()
   while(voroOpen.size())
   {
     auto current = voroOpen.top();
+    voroOpen.pop();
     if(current->toProcess)
     {
       if(current->toRaise)
@@ -125,27 +124,28 @@ void GVD::updateVoro()
         lowerVoro(current);
       }
     }
-    voroOpen.pop();
   }
 }
 
 void GVD::raiseDist(Cell* s_cell)
 {
-  for(Coordinates c : GetNeighbors(s_cell->x, s_cell->y, width, height))
+  for(Coordinates2D c : GetNeighbors(s_cell->x, s_cell->y, width, height))
   {
-    int tempX = distMap[c.x][c.y]->nearestX;
-    int tempY = distMap[c.x][c.y]->nearestY;
-    if(!isUnknown(tempX, tempY) && !distMap[c.x][c.y]->toRaise)
+    int x = (int)c.x;
+    int y = (int)c.y;
+    int tempX = distMap[x][y]->nearestX;
+    int tempY = distMap[x][y]->nearestY;
+    if(tempX != -1 && tempY != -1 && !distMap[x][y]->toRaise)
     {
       if(!isOccupied(tempX, tempY, false))
       {
-        distMap[c.x][c.y]->nearestX = -1;
-        distMap[c.x][c.y]->nearestY = -1;
-        distMap[c.x][c.y]->dist = numeric_limits<float>::max();
-        distMap[c.x][c.y]->toRaise = true;
+        distMap[x][y]->nearestX = -1;
+        distMap[x][y]->nearestY = -1;
+        distMap[x][y]->dist = numeric_limits<float>::max();
+        distMap[x][y]->toRaise = true;
       }
-      distMap[c.x][c.y]->toProcess = true;
-      distOpen.push(distMap[c.x][c.y]);
+      distMap[x][y]->toProcess = true;
+      distOpen.push(distMap[x][y]);
     }
   }
   distMap[s_cell->x][s_cell->y]->toRaise = false;
@@ -153,21 +153,23 @@ void GVD::raiseDist(Cell* s_cell)
 
 void GVD::raiseVoro(Cell* s_cell)
 {
-  for(Coordinates c : GetNeighbors(s_cell->x, s_cell->y, width, height))
+  for(Coordinates2D c : GetNeighbors(s_cell->x, s_cell->y, width, height))
   {
-    int tempX = voroDistMap[c.x][c.y]->nearestX;
-    int tempY = voroDistMap[c.x][c.y]->nearestY;
-    if(!isUnknown(tempX, tempY) && !voroDistMap[c.x][c.y]->toRaise)
+    int x = (int)c.x;
+    int y = (int)c.y;
+    int tempX = voroDistMap[x][y]->nearestX;
+    int tempY = voroDistMap[x][y]->nearestY;
+    if(tempX != -1 && tempY != -1 && !voroDistMap[x][y]->toRaise)
     {
-      if(!isOccupied(tempX, tempY, false))
+      if(!isOccupied(tempX, tempY, true))
       {
-        voroDistMap[c.x][c.y]->nearestX = -1;
-        voroDistMap[c.x][c.y]->nearestY = -1;
-        voroDistMap[c.x][c.y]->dist = numeric_limits<float>::max();
-        voroDistMap[c.x][c.y]->toRaise = true;
+        voroDistMap[x][y]->nearestX = -1;
+        voroDistMap[x][y]->nearestY = -1;
+        voroDistMap[x][y]->dist = numeric_limits<float>::max();
+        voroDistMap[x][y]->toRaise = true;
       }
-      voroDistMap[c.x][c.y]->toProcess = true;
-      voroOpen.push(voroDistMap[c.x][c.y]);
+      voroDistMap[x][y]->toProcess = true;
+      voroOpen.push(voroDistMap[x][y]);
     }
   }
   voroDistMap[s_cell->x][s_cell->y]->toRaise = false;
@@ -175,26 +177,28 @@ void GVD::raiseVoro(Cell* s_cell)
 
 void GVD::lowerDist(Cell* s_cell)
 {
-  for(Coordinates c : GetNeighbors(s_cell->x, s_cell->y, width, height))
+  for(Coordinates2D c : GetNeighbors(s_cell->x, s_cell->y, width, height))
   {
-    if(!distMap[c.x][c.y]->toRaise)
+    int x = (int)c.x;
+    int y = (int)c.y;
+    if(!distMap[x][y]->toRaise)
     {
       int obstacleX = distMap[s_cell->x][s_cell->y]->nearestX;
       int obstacleY = distMap[s_cell->x][s_cell->y]->nearestY;
-      float dx = obstacleX - c.x;
-      float dy = obstacleY - c.y;
+      float dx = obstacleX - x;
+      float dy = obstacleY - y;
       float distance = sqrt(dx*dx + dy*dy);
-      if(distance < distMap[c.x][c.y]->dist)
+      if(distance < distMap[x][y]->dist)
       {
-        distMap[c.x][c.y]->dist = distance;
-        distMap[c.x][c.y]->nearestX = s_cell->nearestX;
-        distMap[c.x][c.y]->nearestY = s_cell->nearestY;
-        distMap[c.x][c.y]->toProcess = true;
-        distOpen.push(distMap[c.x][c.y]);
+        distMap[x][y]->dist = distance;
+        distMap[x][y]->nearestX = s_cell->nearestX;
+        distMap[x][y]->nearestY = s_cell->nearestY;
+        distMap[x][y]->toProcess = true;
+        distOpen.push(distMap[x][y]);
       }
       else
       {
-        chkVoro(s_cell, distMap[c.x][c.y]);
+        chkVoro(s_cell, distMap[x][y]);
       }
     }
   }
@@ -202,23 +206,25 @@ void GVD::lowerDist(Cell* s_cell)
 
 void GVD::lowerVoro(Cell* s_cell)
 {
-  for(Coordinates c : GetNeighbors(s_cell->x, s_cell->y, width, height))
+  for(Coordinates2D c : GetNeighbors(s_cell->x, s_cell->y, width, height))
   {
-    if(!voroDistMap[c.x][c.y]->toRaise)
+    int x = (int)c.x;
+    int y = (int)c.y;
+    if(!voroDistMap[x][y]->toRaise)
     {
       int obstacleX = voroDistMap[s_cell->x][s_cell->y]->nearestX;
       int obstacleY = voroDistMap[s_cell->x][s_cell->y]->nearestY;
-      float dx = obstacleX - c.x;
-      float dy = obstacleY - c.y;
+      float dx = obstacleX - x;
+      float dy = obstacleY - y;
       float distance = sqrt(dx*dx + dy*dy);
-      if(distance < voroDistMap[c.x][c.y]->dist)
+      if(distance < voroDistMap[x][y]->dist)
       {
         
-        voroDistMap[c.x][c.y]->dist = distance;
-        voroDistMap[c.x][c.y]->nearestX = s_cell->nearestX;
-        voroDistMap[c.x][c.y]->nearestY = s_cell->nearestY;
-        voroDistMap[c.x][c.y]->toProcess = true;
-        voroOpen.push(voroDistMap[c.x][c.y]);
+        voroDistMap[x][y]->dist = distance;
+        voroDistMap[x][y]->nearestX = s_cell->nearestX;
+        voroDistMap[x][y]->nearestY = s_cell->nearestY;
+        voroDistMap[x][y]->toProcess = true;
+        voroOpen.push(voroDistMap[x][y]);
       }
     }
   }

@@ -1,26 +1,26 @@
 #include "include/utils.hpp"
 
-vector<Coordinates> GetNeighbors(int x, int y, int dimX, int dimY)
+vector<Coordinates2D> GetNeighbors(int x, int y, int dimX, int dimY)
 {
-  vector<Coordinates> coords;
+  vector<Coordinates2D> coords;
   if(pointInGrid(x, y, dimX, dimY))
   {
     if(x - 1 >= 0)
     {
-      Coordinates location;
+      Coordinates2D location;
       location.x = x-1;
       location.y = y;
       coords.push_back(location);
       if(y - 1 >= 0)
       {
-        Coordinates otherLocation;
+        Coordinates2D otherLocation;
         otherLocation.x = x-1;
         otherLocation.y = y-1;
         coords.push_back(otherLocation);
       }
       if(y + 1 < dimY)
       {
-        Coordinates otherLocation;
+        Coordinates2D otherLocation;
         otherLocation.x = x-1;
         otherLocation.y = y+1;
         coords.push_back(otherLocation);
@@ -28,20 +28,20 @@ vector<Coordinates> GetNeighbors(int x, int y, int dimX, int dimY)
     }
     if(x + 1 < dimX)
     {
-      Coordinates location;
+      Coordinates2D location;
       location.x = x+1;
       location.y = y;
       coords.push_back(location);
       if(y - 1 >= 0)
       {
-        Coordinates otherLocation;
+        Coordinates2D otherLocation;
         otherLocation.x = x+1;
         otherLocation.y = y-1;
         coords.push_back(otherLocation);
       }
       if(y + 1 < dimY)
       {
-        Coordinates otherLocation;
+        Coordinates2D otherLocation;
         otherLocation.x = x+1;
         otherLocation.y = y+1;
         coords.push_back(otherLocation);
@@ -49,14 +49,14 @@ vector<Coordinates> GetNeighbors(int x, int y, int dimX, int dimY)
     }
     if(y - 1 >= 0)
     {
-      Coordinates location;
+      Coordinates2D location;
       location.x = x;
       location.y = y-1;
       coords.push_back(location);
     }
     if(y + 1 < dimY)
     {
-      Coordinates location;
+      Coordinates2D location;
       location.x = x;
       location.y = y+1;
       coords.push_back(location);
@@ -69,11 +69,11 @@ bool pointInGrid(int x, int y, int dimX, int dimY)
 {
   return (x >= 0 && y >= 0) && (x < dimX && y < dimY);
 }
-Coordinates rotate(float x, float y, float radians)
+Coordinates2D rotate(float x, float y, float radians)
 {
   float c = cos(radians);
   float s = sin(radians);
-  Coordinates rotatedPts;
+  Coordinates2D rotatedPts;
   rotatedPts.x = x*c + x*(s*-1);
   rotatedPts.y = y*s+y*c;
   return rotatedPts;
@@ -99,14 +99,14 @@ float mod2PI(float theta)
   return theta;
 }
 
-CoordinatesWithDirection changeOfBasis(CoordinatesWithDirection start, CoordinatesWithDirection end)
+Coordinates3D changeOfBasis(Coordinates3D start, Coordinates3D end)
 {
   float dx = end.x - start.x;
   float dy = end.y - start.y;
   float new_x = dx * cos(start.radians) + dy*sin(start.radians);
   float new_y = -dx * sin(start.radians) + dy * cos(start.radians);
   float new_theta = end.radians - start.radians;
-  return CoordinatesWithDirection{new_x, new_y, new_theta};
+  return Coordinates3D{new_x, new_y, new_theta};
 }
 
 // #These functions are general functions can be used in mult. files

@@ -26,7 +26,7 @@ VehicleState Vehicle::getNextState(VehicleState current, Steer steer, Gear gear,
         xPos *= -1;
         angle *= -1;
     }
-    Coordinates correctedPos = rotate(xPos, yPos, current.ori);
+    Coordinates2D correctedPos = rotate(xPos, yPos, current.ori);
     VehicleState copy = current;
     copy.posX = correctedPos.x;
     copy.posY = correctedPos.y;

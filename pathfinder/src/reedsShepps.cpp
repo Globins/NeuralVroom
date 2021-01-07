@@ -30,10 +30,6 @@ void ReedsSheppsAction::revGear()
     }
 }
 
-ReedsSheepsCurves::ReedsSheepsCurves(Vehicle vehicle)
-{
-    
-}
 
 float ReedsSheepsCurves::calculatePathLength(vector<ReedsSheppsAction> path)
 {
@@ -44,7 +40,7 @@ float ReedsSheepsCurves::calculatePathLength(vector<ReedsSheppsAction> path)
     }
     return pathlength;
 }
-vector<ReedsSheppsAction> ReedsSheepsCurves::findOptimalPath(CoordinatesWithDirection start, CoordinatesWithDirection end)
+vector<ReedsSheppsAction> ReedsSheepsCurves::findOptimalPath(Coordinates3D start, Coordinates3D end)
 {
     vector<vector<ReedsSheppsAction>> allPaths = findAllPaths(start, end);
     int index = 0;
@@ -59,9 +55,9 @@ vector<ReedsSheppsAction> ReedsSheepsCurves::findOptimalPath(CoordinatesWithDire
     }
     return allPaths[index];
 }
-vector<vector<ReedsSheppsAction>> ReedsSheepsCurves::findAllPaths(CoordinatesWithDirection start, CoordinatesWithDirection end)
+vector<vector<ReedsSheppsAction>> ReedsSheepsCurves::findAllPaths(Coordinates3D start, Coordinates3D end)
 {
-    CoordinatesWithDirection calculateBasedOffThis = changeOfBasis(start, end);
+    Coordinates3D calculateBasedOffThis = changeOfBasis(start, end);
     float x = calculateBasedOffThis.x;
     float y = calculateBasedOffThis.y;
     float radians = calculateBasedOffThis.radians;

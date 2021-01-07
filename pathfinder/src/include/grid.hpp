@@ -4,7 +4,7 @@
 
 class Grid : public GVD
 {
-    vector<Coordinates> obstacleList;
+    vector<Coordinates2D> obstacleList;
 public:
     Grid(int width, int height);
     void addObstacle(int x, int y);
@@ -13,7 +13,8 @@ public:
     vector<vector<float>> returnDistMap();
     vector<vector<float>> returnVoroDistMap();
     vector<vector<bool>> returnVoroMap();
-    bool isSafe(float safetyFactor);
+    vector<vector<Coordinates2D>> returnNearest();
+    bool isSafe(VehicleState state, float safetyFactor);
 };
 
 #endif

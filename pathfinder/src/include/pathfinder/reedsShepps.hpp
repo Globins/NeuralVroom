@@ -20,10 +20,10 @@ class ReedsSheepsCurves
 {
     typedef vector<ReedsSheppsAction>(ReedsSheepsCurves::*pathFunction)(float, float, float);
 public:
-    ReedsSheepsCurves(Vehicle vehicle);
+    ReedsSheepsCurves();
     float calculatePathLength(vector<ReedsSheppsAction> path);
-    vector<ReedsSheppsAction> findOptimalPath(CoordinatesWithDirection start, CoordinatesWithDirection end);
-    vector<vector<ReedsSheppsAction>> findAllPaths(CoordinatesWithDirection start, CoordinatesWithDirection end);
+    vector<ReedsSheppsAction> findOptimalPath(Coordinates3D start, Coordinates3D end);
+    vector<vector<ReedsSheppsAction>> findAllPaths(Coordinates3D start, Coordinates3D end);
 
 private:
     void revSteerPath(vector<ReedsSheppsAction> path);

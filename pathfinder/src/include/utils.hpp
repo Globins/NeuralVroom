@@ -4,30 +4,21 @@
 #include <vector>
 #include <math.h>
 #include <iostream>
+#include "globals.hpp"
 
 using namespace std;
-struct Coordinates
-{
-  int x;
-  int y;
-};
-struct PolarCoordinates
-{
-  float radius;
-  float theta;
-};
-struct CoordinatesWithDirection
-{
-  float x;
-  float y;
-  float radians;
-};
-vector<Coordinates> GetNeighbors(int x, int y, int dimX, int dimY);
+
+vector<Coordinates2D> GetNeighbors(int x, int y, int dimX, int dimY);
+
 bool pointInGrid(int x, int y, int dimX, int dimY);
-Coordinates rotate(float x, float y, float radians);
+
+Coordinates2D rotate(float x, float y, float radians);
+
 PolarCoordinates cart2pol(float x, float y);
+
 float mod2PI(float theta);
-CoordinatesWithDirection changeOfBasis(CoordinatesWithDirection start, CoordinatesWithDirection end);
+
+Coordinates3D changeOfBasis(Coordinates3D start, Coordinates3D end);
 
 
 #endif
