@@ -3,8 +3,6 @@
 /* Commonly used structures and enums used throughout the program.*/
 enum Gear{Forward = 0, Backward = 1};
 enum Steer{Straight = 0, Left = 1, Right = 2};
-const int NUM_GEARS = 2;
-const int NUM_STEERS = 3;
 struct PolarCoordinates
 {
   float radius;
@@ -30,7 +28,13 @@ struct Coordinates4D
   float radians;
   Gear gear;
 };
-
+struct DiscreteCoordinates4D
+{
+  int x;
+  int y;
+  float radians;
+  Gear gear;
+};
 struct VehicleState
 {
     float posX;

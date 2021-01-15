@@ -118,3 +118,9 @@ Coordinates3D changeOfBasis(Coordinates3D start, Coordinates3D end)
 //     x1 = x + r * np.cos(rang)
 //     y1 = y + r * np.sin(rang)
 //     return (x1, y1)
+
+
+float deg2rad(float deg)
+{
+  return deg * M_PI / 180.0;
+}

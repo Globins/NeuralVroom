@@ -5,13 +5,13 @@
 
 class Vehicle
 {
+public:
     float width;
     float length;
     float maxTurnAngle;
-    float turnRadius;
-    float velocity;
-public:
-    Vehicle();
+    float turnRadius = 1;
+    float velocity = 1;
+    Vehicle(float width, float length);
     VehicleState getNextState(VehicleState current, Steer steer, Gear gear, float delta_time);
 };
 

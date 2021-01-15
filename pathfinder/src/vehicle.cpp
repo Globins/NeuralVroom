@@ -1,9 +1,16 @@
 #include "include/vehicle.hpp"
 
+Vehicle::Vehicle(float width, float length)
+{
+    this->width = width;
+    this->length = length;
+}
 VehicleState Vehicle::getNextState(VehicleState current, Steer steer, Gear gear, float delta_time)
 {
     float length = velocity*delta_time;
-    float xPos, yPos, angle = 0;
+    float xPos = 0;
+    float yPos = 0;
+    float angle = 0;
     if(steer == Straight)
     {
         xPos = length;
@@ -26,10 +33,12 @@ VehicleState Vehicle::getNextState(VehicleState current, Steer steer, Gear gear,
         xPos *= -1;
         angle *= -1;
     }
+
     Coordinates2D correctedPos = rotate(xPos, yPos, current.ori);
-    VehicleState copy = current;
-    copy.posX = correctedPos.x;
-    copy.posY = correctedPos.y;
-    copy.ori = angle + current.ori;
-    return copy;
+    current.posX += correctedPos.x;
+    current.posY += correctedPos.y;
+    current.ori += angle;
+    current.steer = steer;
+    current.gear = gear;
+    return current;
 }

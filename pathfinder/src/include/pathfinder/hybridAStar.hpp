@@ -12,23 +12,37 @@ struct HybridAStarNode
     HybridAStarNode* parent;
     float g;
     float h;
-    HybridAStarNode();
-    float FCost();
-    //operator overloads
+    float f;
+};
+
+struct HAScomparator
+{
+    bool operator()(const HybridAStarNode a, const HybridAStarNode b)
+    {
+        return a.f > b.f;
+    }
 };
 
 class HybridAStar
 {
-    ReedsSheepsCurves curves = ReedsSheepsCurves();
+    ReedsSheppsCurves curves = ReedsSheppsCurves();
+    Grid *grid;
 public:
-    HybridAStarNode run(VehicleState start, VehicleState end, Grid *grid, Vehicle vehicle);
+    HybridAStar(Grid* grid);
+    vector<VehicleState> run(VehicleState start, VehicleState end, Vehicle vehicle);
 private:
     HybridAStarNode rsPath(VehicleState current, VehicleState goal);
-    float calculateRSCost(vector<ReedsSheppsAction> path, float unit, float revCost, float gearCost);
-    vector<HybridAStarNode> generateResult(HybridAStarNode destination);
-    float calculateDistance(VehicleState current, VehicleState destination);
-    vector<HybridAStarNode> getNextNode(VehicleState current, Gear gear, VehicleState goal);
-    Coordinates4D stateToCell(VehicleState state);
+
+    float calculateRSCost(Vehicle vehicle, vector<ReedsSheppsAction> path, float unit, float revCost, float gearCost);
+    float calculateCost(VehicleState current, VehicleState next, float delta_time);
+    float calcuateHeuristic(VehicleState current, VehicleState goal);
+
+    vector<VehicleState> generateResult(HybridAStarNode destination);
+    vector<HybridAStarNode> getNextNode(VehicleState current, Gear gear, VehicleState goal, Vehicle vehicle);
+
+    DiscreteCoordinates4D stateToCell(VehicleState state);
+
+    bool areEquivalentStates(VehicleState comp, VehicleState other);
     
 };
 

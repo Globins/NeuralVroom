@@ -9,11 +9,15 @@ void Grid::addObstacle(int x, int y)
 {
     GVD::setCell(x, y, false);
     GVD::update();
+    obstacleList.push_back(Coordinates2D{(float)x, (float)y});
+
 }
 void Grid::removeObstacle(int x, int y)
 {
     GVD::unsetCell(x, y, false);
     GVD::update();
+    removeFromObstacleList(x, y);
+
 }
 void Grid::refreshMap()
 {
@@ -77,6 +81,32 @@ vector<vector<Coordinates2D>> Grid::returnNearest()
 }
 bool Grid::isSafe(VehicleState state, float safetyFactor)
 {
-    return false;
+    int x = (int)state.posX;
+    int y = (int)state.posY;
+    return distMap[x][y]->dist >= safetyFactor;
+}
+void Grid::removeFromObstacleList(int x, int y)
+{
+    int index = -1;
+    for (auto it = obstacleList.begin(); it != obstacleList.end(); ++it) {
+        index = std::distance(obstacleList.begin(), it);
+        if(it->x == x && it->y == y)
+        {
+            break;
+        }
+    }
+    if(index != -1)
+    {
+        obstacleList.erase(obstacleList.begin() + index);
+    }
 }
 
+
+Coordinates2D Grid::getNearestObstDist(int x, int y)
+{
+    return Coordinates2D{(float)distMap[x][y]->nearestX, (float)distMap[x][y]->nearestY};
+}
+Coordinates2D Grid::getNearestVoroDist(int x, int y)
+{
+    return Coordinates2D{(float)voroDistMap[x][y]->nearestX, (float)voroDistMap[x][y]->nearestY};
+}

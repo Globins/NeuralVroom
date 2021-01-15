@@ -15,15 +15,17 @@ public:
 
 };
 
-
-class ReedsSheepsCurves
+//Single Steering and motion over some length FORMULAS BASED OFF THE REEDS SHEPP PAPER:
+//https://projecteuclid.org/download/pdf_1/euclid.pjm/1102645450
+//some equations are modified using optimizations from http://msl.cs.uiuc.edu/~lavalle/cs326a/rs.c
+class ReedsSheppsCurves
 {
-    typedef vector<ReedsSheppsAction>(ReedsSheepsCurves::*pathFunction)(float, float, float);
+    typedef vector<ReedsSheppsAction>(ReedsSheppsCurves::*pathFunction)(float, float, float);
 public:
-    ReedsSheepsCurves();
     float calculatePathLength(vector<ReedsSheppsAction> path);
     vector<ReedsSheppsAction> findOptimalPath(Coordinates3D start, Coordinates3D end);
     vector<vector<ReedsSheppsAction>> findAllPaths(Coordinates3D start, Coordinates3D end);
+    vector<VehicleState> discretizePath(VehicleState current, vector<ReedsSheppsAction> rsPath, float unit, float length);
 
 private:
     void revSteerPath(vector<ReedsSheppsAction> path);

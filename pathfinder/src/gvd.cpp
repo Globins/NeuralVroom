@@ -1,5 +1,5 @@
 #include "include/gvd.hpp"
-//http://www.first-mm.eu/files/lau10iros.pdf
+
 
 
 GVD::GVD(int x_length, int y_length)
@@ -23,7 +23,7 @@ GVD::GVD(int x_length, int y_length)
   }
   voro.resize(width,vector<bool>(height, false));
   comp.resize(width,vector<int>(height, -1));
-
+  
   cost.resize(width,vector<float>(height, numeric_limits<float>::max()));
 }
 
@@ -31,6 +31,7 @@ void GVD::update()
 {
   updateDist();
   updateVoro();
+  updateCostMap();
 }
 void GVD::setCell(int x, int y, bool isVoroMap)
 {
@@ -263,6 +264,25 @@ void GVD::chkVoro(Cell* s_cell, Cell* n_cell)
     }
   }
 
+}
+
+void GVD::updateCostMap()
+{
+  for(int i = 0; i < width; i++)
+  {
+    for(int q = 0; q < height; q++)
+    {   
+      if(distMap[i][q]->dist >= dmaxDefault || voroDistMap[i][q]->dist == numeric_limits<float>::max())
+      {
+        cost[i][q] = 0;
+      }
+      else
+      {
+         cost[i][q] = (alphaDefault / (alphaDefault + distMap[i][q]->dist)) * (voroDistMap[i][q]->dist / (distMap[i][q]->dist + voroDistMap[i][q]->dist)) * ((dmaxDefault - distMap[i][q]->dist) / (dmaxDefault * dmaxDefault));
+      }
+      
+    }
+  }
 }
 GVD::~GVD() 
 { 

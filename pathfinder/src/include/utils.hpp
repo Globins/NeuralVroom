@@ -20,5 +20,6 @@ float mod2PI(float theta);
 
 Coordinates3D changeOfBasis(Coordinates3D start, Coordinates3D end);
 
+float deg2rad(float deg);
 
 #endif

@@ -5,7 +5,7 @@
 #include <queue>
 #include <limits>
 #include <functional>
-
+//http://www.first-mm.eu/files/lau10iros.pdf
 struct Cell
 {
   float dist = numeric_limits<float>::max();
@@ -17,7 +17,7 @@ struct Cell
 }
 };
 
-struct comparator
+struct GVDcomparator
 {
     bool operator()(const Cell * a, const Cell *b)
     {
@@ -33,11 +33,9 @@ public:
   void unsetCell(int x, int y, bool isVoroMap);
   ~GVD();
 private:
-  int width;
-  int height;
 
-  priority_queue<Cell*, vector<Cell*>, comparator> distOpen;
-  priority_queue<Cell*, vector<Cell*>, comparator> voroOpen;
+  priority_queue<Cell*, vector<Cell*>, GVDcomparator> distOpen;
+  priority_queue<Cell*, vector<Cell*>, GVDcomparator> voroOpen;
 
   const int alphaDefault = 20;
   const int dmaxDefault = 30;
@@ -54,8 +52,13 @@ private:
   void lowerVoro(Cell* s_cell);
 
   void chkVoro(Cell* s_cell, Cell* n_cell);
-  
+
+  void updateCostMap();
+
 public:
+  int width;
+  int height;
+  
   vector<vector<bool>> voro;
   vector<vector<int>> comp;
 

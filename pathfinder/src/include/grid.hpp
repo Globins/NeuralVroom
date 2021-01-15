@@ -15,6 +15,11 @@ public:
     vector<vector<bool>> returnVoroMap();
     vector<vector<Coordinates2D>> returnNearest();
     bool isSafe(VehicleState state, float safetyFactor);
+    void removeFromObstacleList(int x, int y);
+
+    Coordinates2D getNearestObstDist(int x, int y);
+    Coordinates2D getNearestVoroDist(int x, int y);
+
 };
 
 #endif
