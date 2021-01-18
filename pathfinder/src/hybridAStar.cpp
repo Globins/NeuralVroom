@@ -22,7 +22,6 @@ HybridAStarNode* HybridAStar::rsPath(VehicleState current, VehicleState goal)
             break;
         }
     }
-    cout << rsNode->rsPath.size() << endl;
     if(safe)
     {
         return rsNode;
@@ -108,7 +107,7 @@ vector<VehicleState> HybridAStar::generateResult(HybridAStarNode destination)
     }
     return path;
 }
-vector<HybridAStarNode*> HybridAStar::getNextNode(VehicleState current, Gear gear, VehicleState goal, Vehicle vehicle)
+vector<HybridAStarNode*> HybridAStar::getNextNode(VehicleState current, Gear gear, VehicleState goal, Vehicle vehicle, float costToEnd)
 {
     vector<HybridAStarNode*> nodes;
     for(Steer steer : {Straight, Left, Right})
@@ -120,9 +119,7 @@ vector<HybridAStarNode*> HybridAStar::getNextNode(VehicleState current, Gear gea
             nodes.push_back(nextNode);
         }
     }
-    // cost of RS
-    int cost = 9;
-    if(cost < 10)
+    if(costToEnd < 10 || ((double) rand() / (RAND_MAX)) > 10/(costToEnd*costToEnd))
     {
         HybridAStarNode* rsNode = rsPath(current, goal);
         if(rsNode != nullptr)
@@ -152,22 +149,6 @@ vector<VehicleState> HybridAStar::run(VehicleState start, VehicleState end, Vehi
     openList.push(startNode);
     while(!openList.empty())
     {
-        // for (auto row = costMap.begin(); row != costMap.end(); row++) {
-        //     vector<float> pushRow;
-        //     for (auto col = row->begin(); col != row->end(); col++) 
-        //     {
-        //         if(*col == numeric_limits<float>::max())
-        //         {
-        //             cout << -1 << " ";
-        //         }
-        //         else
-        //         {
-        //             cout << *col << " ";
-        //         }
-        //     }
-        //     cout << endl;
-        // }
-        // cout << endl;
         HybridAStarNode* current = openList.top();
         openList.pop();
         closedList.push_back(current);
@@ -176,26 +157,24 @@ vector<VehicleState> HybridAStar::run(VehicleState start, VehicleState end, Vehi
             path = generateResult(*current);
             break;
         }
-
+        DiscreteCoordinates4D currlocation = stateToCell(current->state);
         for(Gear gear : {Forward, Backward})
         {
-            vector<HybridAStarNode*> children = getNextNode(current->state, gear, end, vehicle);
+            vector<HybridAStarNode*> children = getNextNode(current->state, gear, end, vehicle, heuristicMap[currlocation.x][currlocation.y]);
             for(HybridAStarNode* child : children)
             {
                 child->parent = closedList.back();
                 if(!child->rsPath.empty())
                 {
                     child->g += current->g + calculateRSCost(vehicle, child->rsPath, 1, 1, 1);
-                    cout << "HONK" << endl;
                 }
                 else
                 {
                     child->g += current->g + calculateCost(current->state, child->state, 1);
                 }
-                
-                child->h += heuristicMap[(int)child->state.posX][(int)child->state.posY];
-                child->f = child->h + child->g;
                 DiscreteCoordinates4D location = stateToCell(child->state);
+                child->h += heuristicMap[location.x][location.y];
+                child->f = child->h + child->g; 
                 if(child->f < costMap[location.x][location.y])
                 {
                     costMap[location.x][location.y] = child->f;

@@ -38,7 +38,7 @@ private:
     vector<vector<float>> calculateHeuristic(VehicleState goal);
 
     vector<VehicleState> generateResult(HybridAStarNode destination);
-    vector<HybridAStarNode*> getNextNode(VehicleState current, Gear gear, VehicleState goal, Vehicle vehicle);
+    vector<HybridAStarNode*> getNextNode(VehicleState current, Gear gear, VehicleState goal, Vehicle vehicle, float costToEnd);
 
     DiscreteCoordinates4D stateToCell(VehicleState state);
 
