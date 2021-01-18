@@ -17,9 +17,9 @@ struct HybridAStarNode
 
 struct HAScomparator
 {
-    bool operator()(const HybridAStarNode a, const HybridAStarNode b)
+    bool operator()(const HybridAStarNode* a, const HybridAStarNode* b)
     {
-        return a.f > b.f;
+        return a->f > b->f;
     }
 };
 
@@ -31,14 +31,14 @@ public:
     HybridAStar(Grid* grid);
     vector<VehicleState> run(VehicleState start, VehicleState end, Vehicle vehicle);
 private:
-    HybridAStarNode rsPath(VehicleState current, VehicleState goal);
+    HybridAStarNode* rsPath(VehicleState current, VehicleState goal);
 
     float calculateRSCost(Vehicle vehicle, vector<ReedsSheppsAction> path, float unit, float revCost, float gearCost);
     float calculateCost(VehicleState current, VehicleState next, float delta_time);
-    float calcuateHeuristic(VehicleState current, VehicleState goal);
+    vector<vector<float>> calculateHeuristic(VehicleState goal);
 
     vector<VehicleState> generateResult(HybridAStarNode destination);
-    vector<HybridAStarNode> getNextNode(VehicleState current, Gear gear, VehicleState goal, Vehicle vehicle);
+    vector<HybridAStarNode*> getNextNode(VehicleState current, Gear gear, VehicleState goal, Vehicle vehicle);
 
     DiscreteCoordinates4D stateToCell(VehicleState state);
 

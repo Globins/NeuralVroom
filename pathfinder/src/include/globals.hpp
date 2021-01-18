@@ -15,6 +15,19 @@ struct Coordinates2D
   float x;
   float y;
 };
+struct DijkstraStruct
+{
+  float x;
+  float y;
+  float dist;
+};
+struct DijkstraStructComp
+{
+    bool operator()(const DijkstraStruct a, const DijkstraStruct b)
+    {
+        return a.dist > b.dist;
+    }
+};
 struct Coordinates3D
 {
   float x;

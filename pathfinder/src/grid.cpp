@@ -110,3 +110,31 @@ Coordinates2D Grid::getNearestVoroDist(int x, int y)
 {
     return Coordinates2D{(float)voroDistMap[x][y]->nearestX, (float)voroDistMap[x][y]->nearestY};
 }
+
+vector<vector<float>> Grid::nonHolonomicRelaxedCostMap(VehicleState goal)
+{
+    vector<vector<float>> heuristicMap;
+    heuristicMap.resize(width,vector<float>(height, numeric_limits<float>::max()));
+    priority_queue<DijkstraStruct, vector<DijkstraStruct>, DijkstraStructComp> heuristicQueue;
+
+    DijkstraStruct start = DijkstraStruct{goal.posX, goal.posY, 0};
+    heuristicMap[goal.posX][goal.posY] = 0;
+
+    heuristicQueue.push(start);
+    while(!heuristicQueue.empty())
+    {
+        DijkstraStruct current = heuristicQueue.top();
+        heuristicQueue.pop();
+        for(Coordinates2D n : GetNeighbors(current.x, current.y, width, height))
+        {
+            float dist = current.dist + 1;
+            if(dist < heuristicMap[n.x][n.y] && !isOccupied(n.x, n.y, false))
+            {
+                DijkstraStruct neighbor = DijkstraStruct{n.x, n.y, dist};
+                heuristicMap[n.x][n.y] = dist;
+                heuristicQueue.push(neighbor);
+            }
+        }
+    }
+    return heuristicMap;
+}

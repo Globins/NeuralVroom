@@ -1,6 +1,6 @@
 #include "include/gvd.hpp"
 
-
+// cost formula from https://ai.stanford.edu/~ddolgov/papers/dolgov_gpp_stair08.pdf
 
 GVD::GVD(int x_length, int y_length)
 {

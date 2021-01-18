@@ -4,6 +4,7 @@
 #include <vector>
 #include <math.h>
 #include <iostream>
+#include <algorithm>
 #include "globals.hpp"
 
 using namespace std;

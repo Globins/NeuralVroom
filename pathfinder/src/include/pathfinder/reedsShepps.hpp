@@ -28,11 +28,6 @@ public:
     vector<VehicleState> discretizePath(VehicleState current, vector<ReedsSheppsAction> rsPath, float unit, float length);
 
 private:
-    void revSteerPath(vector<ReedsSheppsAction> path);
-    void revGearPath(vector<ReedsSheppsAction> path);
-
-
-
     vector<ReedsSheppsAction> one_CSC_SameTurns(float x, float y, float radians);
     vector<ReedsSheppsAction> two_CSC_DiffTurns(float x, float y, float radians);
     vector<ReedsSheppsAction> three_CCC(float x, float y, float radians);

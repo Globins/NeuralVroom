@@ -74,14 +74,15 @@ Coordinates2D rotate(float x, float y, float radians)
   float c = cos(radians);
   float s = sin(radians);
   Coordinates2D rotatedPts;
-  rotatedPts.x = x*c + x*(s*-1);
-  rotatedPts.y = y*s+y*c;
+  rotatedPts.x = x*c - y*s;
+  rotatedPts.y = x*s + y*c;
   return rotatedPts;
 }
 
 PolarCoordinates cart2pol(float x, float y)
 {
-  PolarCoordinates result = {sqrt(x*x + y*y), atan2(y, x)};
+  float angle = atan2(y, x);
+  PolarCoordinates result = {sqrt(x*x + y*y), angle};
   return result;
 }
 

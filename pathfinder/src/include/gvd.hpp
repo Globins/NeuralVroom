@@ -31,6 +31,8 @@ public:
   void update();
   void setCell(int x, int y, bool isVoroMap);
   void unsetCell(int x, int y, bool isVoroMap);
+  bool isOccupied(int x, int y, bool isVoroMap);
+  bool isUnknown(int x, int y);
   ~GVD();
 private:
 
@@ -40,8 +42,8 @@ private:
   const int alphaDefault = 20;
   const int dmaxDefault = 30;
   
-  bool isOccupied(int x, int y, bool isVoroMap);
-  bool isUnknown(int x, int y);
+ 
+  
 
   void updateDist();
   void raiseDist(Cell* s_cell);

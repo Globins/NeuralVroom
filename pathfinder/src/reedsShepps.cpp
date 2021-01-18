@@ -44,13 +44,13 @@ vector<ReedsSheppsAction> ReedsSheppsCurves::findOptimalPath(Coordinates3D start
 {
     vector<vector<ReedsSheppsAction>> allPaths = findAllPaths(start, end);
     int index = 0;
-    float smallestPath = calculatePathLength(allPaths[0]);
-    for(vector<vector<ReedsSheppsAction>>::size_type i = 1; i != allPaths.size(); i++) {
-        float currentPath = calculatePathLength(allPaths[i]);
-        if(currentPath < smallestPath)
+    float smallestLength = calculatePathLength(allPaths[0]);
+    for(vector<vector<ReedsSheppsAction>>::size_type i = 1; i < allPaths.size(); i++) {
+        float length = calculatePathLength(allPaths[i]);
+        if(length <= smallestLength)
         {
             index = i;
-            smallestPath = currentPath;
+            smallestLength = length;
         }
     }
     return allPaths[index];
@@ -66,41 +66,45 @@ vector<vector<ReedsSheppsAction>> ReedsSheppsCurves::findAllPaths(Coordinates3D 
     {
         paths.push_back((this->*pathFunctions[i])(x,y,radians));
         vector<ReedsSheppsAction> revG = (this->*pathFunctions[i])(-x,y,-radians);
-        revGearPath(revG);
+        for(int i = 0; i < revG.size(); i++)
+        {
+            revG[i].revGear();
+        }
         paths.push_back(revG);
         vector<ReedsSheppsAction> revS = (this->*pathFunctions[i])(x,-y,-radians);
-        revSteerPath(revS);
+        for(int i = 0; i < revS.size(); i++)
+        {
+            revS[i].revSteer();
+        }
         paths.push_back(revS);
         vector<ReedsSheppsAction> revSG = (this->*pathFunctions[i])(-x,-y,radians);
-        revGearPath(revSG);
-        revSteerPath(revSG);
+        for(int i = 0; i < revSG.size(); i++)
+        {
+            revSG[i].revGear();
+            revSG[i].revSteer();
+        }
         paths.push_back(revSG);
     }
-    //FILTER THROUGH SEGMENTS OF LENGTH 0
-    return paths;
-}
-void ReedsSheppsCurves::revSteerPath(vector<ReedsSheppsAction> path)
-{
-    for(ReedsSheppsAction rsa : path)
+    vector<vector<ReedsSheppsAction>> filteredpaths;
+    for(auto path : paths)
     {
-        rsa.revSteer();
+        if(calculatePathLength(path))
+        {
+            filteredpaths.push_back(path);
+        }
     }
+    return filteredpaths;
 }
-void ReedsSheppsCurves::revGearPath(vector<ReedsSheppsAction> path)
-{
-    for(ReedsSheppsAction rsa : path)
-    {
-        rsa.revGear();
-    }
-}
+
 vector<VehicleState> ReedsSheppsCurves::discretizePath(VehicleState current, vector<ReedsSheppsAction> rsPath, float unit, float length)
 {
     VehicleState state = current;
     vector<VehicleState> states;
     states.push_back(state);
+    //length is both arc angle and length
     for(ReedsSheppsAction action : rsPath)
     {
-        int steps = (int)(action.length * unit / length);
+        int steps = (int)(ceil(action.length * unit / length));
         if(action.steer != Straight)
         {
             float angle = action.length / steps;
@@ -140,7 +144,6 @@ vector<VehicleState> ReedsSheppsCurves::discretizePath(VehicleState current, vec
                 states.push_back(current);
             }
         }
-        
     }
     return states;
 }
@@ -148,8 +151,9 @@ vector<ReedsSheppsAction> ReedsSheppsCurves::one_CSC_SameTurns(float x, float y,
 {
     vector<ReedsSheppsAction> segment;
     PolarCoordinates rAndTheta = cart2pol(x - sin(radians), y - 1 + cos(radians)); //U and T
+    
     float v = mod2PI(radians - rAndTheta.theta);
-    if( rAndTheta.theta >= 0 &&  rAndTheta.radius >= 0 && v >= 0)
+    if(rAndTheta.theta >= 0 &&  rAndTheta.radius >= 0 && v >= 0)
     {
         segment.push_back(ReedsSheppsAction(Left, Forward, rAndTheta.theta));
         segment.push_back(ReedsSheppsAction(Straight, Forward, rAndTheta.radius));
@@ -164,7 +168,7 @@ vector<ReedsSheppsAction> ReedsSheppsCurves::two_CSC_DiffTurns(float x, float y,
     if(rAndTheta.radius*rAndTheta.radius >= 4)
     {
         float u = sqrt(rAndTheta.radius*rAndTheta.radius -4);
-        float t = mod2PI(radians + atan2(2, u));
+        float t = mod2PI(rAndTheta.theta + atan2(2, u));
         float v = mod2PI(t - radians);
         if(t >= 0 && u >= 0 && v >= 0)
         {
@@ -182,7 +186,7 @@ vector<ReedsSheppsAction> ReedsSheppsCurves::three_CCC(float x, float y, float r
     if(rAndTheta.radius <= 4)
     {
         float a = acos(rAndTheta.radius/4);
-        float t = mod2PI(radians + M_PI/2 + a);
+        float t = mod2PI(rAndTheta.theta + M_PI/2 + a);
         float u = mod2PI(M_PI - 2*a);
         float v = mod2PI(radians - t - u);
         if(t >= 0 && u >= 0 && v >= 0)
@@ -201,7 +205,7 @@ vector<ReedsSheppsAction> ReedsSheppsCurves::four_C_CC(float x, float y, float r
     if(rAndTheta.radius <= 4)
     {
         float a = acos(rAndTheta.radius/4);
-        float t = mod2PI(radians + M_PI/2 + a);
+        float t = mod2PI(rAndTheta.theta + M_PI/2 + a);
         float u = mod2PI(M_PI - 2*a);
         float v = mod2PI(t + u - radians);
         if(t >= 0 && u >= 0 && v >= 0)
@@ -221,7 +225,7 @@ vector<ReedsSheppsAction> ReedsSheppsCurves::five_CC_C(float x, float y, float r
     {
         float u = acos(1 - rAndTheta.radius*rAndTheta.radius/8);
         float a = asin(2*sin(u)/rAndTheta.radius);
-        float t = mod2PI(radians + M_PI/2 - a);
+        float t = mod2PI(rAndTheta.theta + M_PI/2 - a);
         float v = mod2PI(t - u - radians);
         if(t >= 0 && u >= 0 && v >= 0)
         {
@@ -242,14 +246,14 @@ vector<ReedsSheppsAction> ReedsSheppsCurves::six_CCu_CuC(float x, float y, float
         if(rAndTheta.radius <= 2)
         {
             a = acos((rAndTheta.radius+2)/4);
-            t = mod2PI(radians + M_PI/2 + a);
+            t = mod2PI(rAndTheta.theta + M_PI/2 + a);
             u = mod2PI(a);
             v = mod2PI(radians - t + 2*u);
         }
         else
         {
             a = acos((rAndTheta.radius-2)/4);
-            t = mod2PI(radians + M_PI/2 - a);
+            t = mod2PI(rAndTheta.theta + M_PI/2 - a);
             u = mod2PI(M_PI - a);
             v = mod2PI(radians - t + 2*u);
         }
@@ -365,6 +369,7 @@ vector<ReedsSheppsAction> ReedsSheppsCurves::eleven_CSCp2_C_DiffTurn(float x, fl
 vector<ReedsSheppsAction> ReedsSheppsCurves::twelve_C_Cpi2SCpi2_C(float x, float y, float radians)
 {
     vector<ReedsSheppsAction> segment;
+    
     PolarCoordinates rAndTheta = cart2pol(x + sin(radians), y - 1 - cos(radians));
     if(rAndTheta.radius >= 4)
     {
@@ -383,4 +388,3 @@ vector<ReedsSheppsAction> ReedsSheppsCurves::twelve_C_Cpi2SCpi2_C(float x, float
     }  
     return segment;
 }
-

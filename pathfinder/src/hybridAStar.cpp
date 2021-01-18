@@ -4,17 +4,16 @@ HybridAStar::HybridAStar(Grid* grid)
 {
     this->grid = grid;  
 }
-HybridAStarNode HybridAStar::rsPath(VehicleState current, VehicleState goal)
+HybridAStarNode* HybridAStar::rsPath(VehicleState current, VehicleState goal)
 {
     bool safe = true;
-    HybridAStarNode rsNode;
-    HybridAStarNode empty;
-    rsNode.state = goal;
+    HybridAStarNode* rsNode = new HybridAStarNode();
+    rsNode->state = goal;
     
     Coordinates3D start = {current.posX, current.posY, current.ori};
     Coordinates3D end = {goal.posX, goal.posY, goal.ori};
-    rsNode.rsPath = curves.findOptimalPath(start, end);
-    vector<VehicleState> statePath = curves.discretizePath(current, rsNode.rsPath, 1, 1);
+    rsNode->rsPath = curves.findOptimalPath(start, end);
+    vector<VehicleState> statePath = curves.discretizePath(current, rsNode->rsPath, 1, 1);
     for(VehicleState state : statePath)
     {
         if(!grid->isSafe(state, 1.5))
@@ -23,11 +22,12 @@ HybridAStarNode HybridAStar::rsPath(VehicleState current, VehicleState goal)
             break;
         }
     }
+    cout << rsNode->rsPath.size() << endl;
     if(safe)
     {
         return rsNode;
     }
-    return empty;
+    return nullptr;
 }
 float HybridAStar::calculateRSCost(Vehicle vehicle, vector<ReedsSheppsAction> path, float unit, float revCost, float gearCost)
 {
@@ -85,15 +85,21 @@ float HybridAStar::calculateCost(VehicleState current, VehicleState next, float 
     DiscreteCoordinates4D toCellLocation = stateToCell(next);
     return revCost + distance + distance*grid->cost[toCellLocation.x][toCellLocation.y]; //*voronoifieldfactor
 }
-float HybridAStar::calcuateHeuristic(VehicleState current, VehicleState goal)
-{
-    return 0;
-}
+
 vector<VehicleState> HybridAStar::generateResult(HybridAStarNode destination)
 {
     vector<VehicleState> path;
     path.push_back(destination.state);
     HybridAStarNode* pathbefore = destination.parent;
+    if(!destination.rsPath.empty())
+    {
+        cout << "Honk" << endl;
+        vector<VehicleState> statePath = curves.discretizePath(pathbefore->state, destination.rsPath, 1, 1);
+        for(int i = statePath.size()-1; i > 0; i--)
+        {
+            path.push_back(statePath[i]);
+        }
+    }
     while(pathbefore != nullptr)
     {
         HybridAStarNode temp = *pathbefore;
@@ -102,28 +108,28 @@ vector<VehicleState> HybridAStar::generateResult(HybridAStarNode destination)
     }
     return path;
 }
-vector<HybridAStarNode> HybridAStar::getNextNode(VehicleState current, Gear gear, VehicleState goal, Vehicle vehicle)
+vector<HybridAStarNode*> HybridAStar::getNextNode(VehicleState current, Gear gear, VehicleState goal, Vehicle vehicle)
 {
-    vector<HybridAStarNode> nodes;
+    vector<HybridAStarNode*> nodes;
     for(Steer steer : {Straight, Left, Right})
     {
-        HybridAStarNode nextNode;
-        nextNode.state = vehicle.getNextState(current, steer, gear, 1);
-        if(pointInGrid(nextNode.state.posX, nextNode.state.posY, grid->width, grid->height) && grid->isSafe(nextNode.state, 1.5))
+        HybridAStarNode* nextNode = new HybridAStarNode();
+        nextNode->state = vehicle.getNextState(current, steer, gear, 1);
+        if(pointInGrid(nextNode->state.posX, nextNode->state.posY, grid->width, grid->height) && grid->isSafe(nextNode->state, 1.5))
         {
             nodes.push_back(nextNode);
         }
     }
-    //cost of RS
-    // int cost = 9;
-    // if(cost < 10)
-    // {
-    //     HybridAStarNode rsNode = rsPath(current, goal);
-    //     if(areEquivalentStates(rsNode.state, goal))
-    //     {
-    //         nodes.push_back(rsNode);
-    //     }
-    // }
+    // cost of RS
+    int cost = 9;
+    if(cost < 10)
+    {
+        HybridAStarNode* rsNode = rsPath(current, goal);
+        if(rsNode != nullptr)
+        {
+            nodes.push_back(rsNode);
+        }
+    }
     return nodes;
 }
 DiscreteCoordinates4D HybridAStar::stateToCell(VehicleState state)
@@ -134,51 +140,85 @@ DiscreteCoordinates4D HybridAStar::stateToCell(VehicleState state)
 
 vector<VehicleState> HybridAStar::run(VehicleState start, VehicleState end, Vehicle vehicle)
 {
-    vector<vector<float>> heuristicMap;
+    vector<vector<float>> heuristicMap = grid->nonHolonomicRelaxedCostMap(end);
     vector<vector<float>> costMap;
+    vector<VehicleState> path;
     costMap.resize(grid->width,vector<float>(grid->height, numeric_limits<float>::max()));
-    HybridAStarNode startNode = HybridAStarNode{start};
-    priority_queue<HybridAStarNode, vector<HybridAStarNode>, HAScomparator> openList;
-    vector<HybridAStarNode> closedList;
+
+    HybridAStarNode* startNode = new HybridAStarNode{start};
+    priority_queue<HybridAStarNode*, vector<HybridAStarNode*>, HAScomparator> openList;
+    vector<HybridAStarNode*> closedList;
+
     openList.push(startNode);
-    while(openList.size())
+    while(!openList.empty())
     {
-        HybridAStarNode current = openList.top();
+        // for (auto row = costMap.begin(); row != costMap.end(); row++) {
+        //     vector<float> pushRow;
+        //     for (auto col = row->begin(); col != row->end(); col++) 
+        //     {
+        //         if(*col == numeric_limits<float>::max())
+        //         {
+        //             cout << -1 << " ";
+        //         }
+        //         else
+        //         {
+        //             cout << *col << " ";
+        //         }
+        //     }
+        //     cout << endl;
+        // }
+        // cout << endl;
+        HybridAStarNode* current = openList.top();
         openList.pop();
         closedList.push_back(current);
-        if(areEquivalentStates(current.state, end))
+        if(areEquivalentStates(current->state, end))
         {
-            return generateResult(current);
+            path = generateResult(*current);
+            break;
         }
+
         for(Gear gear : {Forward, Backward})
         {
-            vector<HybridAStarNode> children = getNextNode(current.state, gear, end, vehicle);
-            for(HybridAStarNode child : children)
+            vector<HybridAStarNode*> children = getNextNode(current->state, gear, end, vehicle);
+            for(HybridAStarNode* child : children)
             {
-                child.parent = &current;
-                if(child.rsPath.size())
+                child->parent = closedList.back();
+                if(!child->rsPath.empty())
                 {
-                    child.g += current.g + calculateRSCost(vehicle, child.rsPath, 1, 1, 1);
+                    child->g += current->g + calculateRSCost(vehicle, child->rsPath, 1, 1, 1);
+                    cout << "HONK" << endl;
                 }
                 else
                 {
-                    child.g += current.g + calculateCost(current.state, child.state, 1);
+                    child->g += current->g + calculateCost(current->state, child->state, 1);
                 }
                 
-                child.h += calcuateHeuristic(child.state, end);
-                child.f = child.h + child.g;
-                
-                DiscreteCoordinates4D location = stateToCell(child.state);
-                if(child.f < costMap[location.x][location.y])
+                child->h += heuristicMap[(int)child->state.posX][(int)child->state.posY];
+                child->f = child->h + child->g;
+                DiscreteCoordinates4D location = stateToCell(child->state);
+                if(child->f < costMap[location.x][location.y])
                 {
-                    costMap[location.x][location.y] = child.f;
+                    costMap[location.x][location.y] = child->f;
                     openList.push(child);
                 }
             }
         }
     }
-    cout << "NO PATH FOUND" << endl;
-    return generateResult(startNode);
+    while(openList.size())
+    {
+        HybridAStarNode* current = openList.top();
+        openList.pop();
+        delete current;
+    }
+    for(auto item : closedList)
+    {
+        delete item;
+    }
+    if(path.empty())
+    {
+        cout << "NO PATH FOUND" << endl;
+    }
+    return path;
 }
 
 bool HybridAStar::areEquivalentStates(VehicleState comp, VehicleState other)

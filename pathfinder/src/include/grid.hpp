@@ -13,10 +13,12 @@ public:
     vector<vector<float>> returnDistMap();
     vector<vector<float>> returnVoroDistMap();
     vector<vector<bool>> returnVoroMap();
+    vector<vector<float>> nonHolonomicRelaxedCostMap(VehicleState goal);
+    
     vector<vector<Coordinates2D>> returnNearest();
     bool isSafe(VehicleState state, float safetyFactor);
     void removeFromObstacleList(int x, int y);
-
+    
     Coordinates2D getNearestObstDist(int x, int y);
     Coordinates2D getNearestVoroDist(int x, int y);
 
