@@ -9,7 +9,7 @@ public:
     float width;
     float length;
     float maxTurnAngle;
-    float turnRadius = 1;
+    float turnRadius = .6;
     float velocity = 1;
     Vehicle(float width, float length);
     VehicleState getNextState(VehicleState current, Steer steer, Gear gear, float delta_time);

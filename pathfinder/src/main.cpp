@@ -1,6 +1,6 @@
 #include "include/grid.hpp"
 #include "include/pathfinder/hybridAStar.hpp"
-#include "include/pathfinder/smoother.hpp"
+
 #include <iostream>
 #include <fstream>
 //grid measurements of 10x10 c
@@ -20,10 +20,8 @@ int main()
     Vehicle testcar = Vehicle(1, 1);
     HybridAStar pathfinder = HybridAStar(&grid);
     VehicleState start = VehicleState{35, 5, deg2rad(90), Forward, Straight};
-    VehicleState end = VehicleState{35, 35, deg2rad(90), Forward, Straight};
-    vector<VehicleState> path = pathfinder.run(start, end, testcar);
-    Smoother smooth = Smoother(&grid);
-    smooth.smooth(path);
+    VehicleState end = VehicleState{4, 31, deg2rad(180), Forward, Straight};
+    vector<VehicleState> path = pathfinder.run(start, end, testcar, true);
     ofstream myfile;
     myfile.open("output.txt");
     for(VehicleState state : path)

@@ -2,7 +2,8 @@
 
 HybridAStar::HybridAStar(Grid* grid)
 {
-    this->grid = grid;  
+    this->grid = grid;
+    this->smoother = Smoother(grid);
 }
 HybridAStarNode* HybridAStar::rsPath(VehicleState current, VehicleState goal)
 {
@@ -138,7 +139,7 @@ DiscreteCoordinates4D HybridAStar::stateToCell(VehicleState state)
 }
 
 
-vector<VehicleState> HybridAStar::run(VehicleState start, VehicleState end, Vehicle vehicle)
+vector<VehicleState> HybridAStar::run(VehicleState start, VehicleState end, Vehicle vehicle, bool smooth)
 {
     vector<vector<float>> heuristicMap = grid->nonHolonomicRelaxedCostMap(end);
     vector<vector<float>> costMap;
@@ -199,6 +200,10 @@ vector<VehicleState> HybridAStar::run(VehicleState start, VehicleState end, Vehi
     if(path.empty())
     {
         cout << "NO PATH FOUND" << endl;
+    }
+    if(smooth)
+    {
+        path = smoother.smooth(path);
     }
     return path;
 }

@@ -38,9 +38,6 @@ private:
 
   priority_queue<Cell*, vector<Cell*>, GVDcomparator> distOpen;
   priority_queue<Cell*, vector<Cell*>, GVDcomparator> voroOpen;
-
-  const int alphaDefault = 20;
-  const int dmaxDefault = 30;
   
  
   
@@ -60,6 +57,8 @@ private:
 public:
   int width;
   int height;
+  const int alphaDefault = 20;
+  const int dmaxDefault = 30;
   
   vector<vector<bool>> voro;
   vector<vector<int>> comp;

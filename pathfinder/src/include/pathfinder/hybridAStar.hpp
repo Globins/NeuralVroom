@@ -3,6 +3,7 @@
 #include "../vehicle.hpp"
 #include "../grid.hpp"
 #include "reedsShepps.hpp"
+#include "smoother.hpp"
 #include <queue>
 
 struct HybridAStarNode
@@ -27,9 +28,10 @@ class HybridAStar
 {
     ReedsSheppsCurves curves = ReedsSheppsCurves();
     Grid *grid;
+    Smoother smoother = Smoother(grid);
 public:
     HybridAStar(Grid* grid);
-    vector<VehicleState> run(VehicleState start, VehicleState end, Vehicle vehicle);
+    vector<VehicleState> run(VehicleState start, VehicleState end, Vehicle vehicle, bool smooth);
 private:
     HybridAStarNode* rsPath(VehicleState current, VehicleState goal);
 

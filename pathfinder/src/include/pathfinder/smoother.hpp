@@ -11,23 +11,21 @@ class Smoother
     float alpha = .2;
     float eps = .000001;
 
-    
-    float weightObst = 0;
-    float weightVoro = 0;
-    float weightCurve = 0;
-    float weightSmooth = 0;
+    float weightPath = 0;
+    float weightObst = 5;
+    float weightVoro = .2;
+    float weightCurve = 4;
+    float weightSmooth = 4;
 
     float obstDMax = 5;
-
+    float voroDMax = 20;
+    float kMax = .9;
     Grid* grid;
 public:
     Smoother(Grid* grid);
     vector<VehicleState> smooth(vector<VehicleState> path);
-    Coordinates2D obstDeriv(VehicleState current);
-    Coordinates2D voroDeriv(VehicleState current);
-    Coordinates2D curveDeriv(VehicleState current);
-    Coordinates2D smoothDeriv(VehicleState current);
-
+private:
+    Coordinates2D orthogonalVector(Coordinates2D a, Coordinates2D b);
 };
 
 
