@@ -88,17 +88,17 @@ float HybridAStar::calculateCost(VehicleState current, VehicleState next, float 
 vector<VehicleState> HybridAStar::generateResult(HybridAStarNode destination)
 {
     vector<VehicleState> path;
-    path.push_back(destination.state);
     HybridAStarNode* pathbefore = destination.parent;
     if(!destination.rsPath.empty())
     {
-        cout << "Honk" << endl;
         vector<VehicleState> statePath = curves.discretizePath(pathbefore->state, destination.rsPath, 1, 1);
-        for(int i = statePath.size()-1; i > 0; i--)
+        for(VehicleState state : statePath)
         {
-            path.push_back(statePath[i]);
+            path.push_back(state);
         }
+        pathbefore = pathbefore->parent;
     }
+    path.push_back(destination.state);
     while(pathbefore != nullptr)
     {
         HybridAStarNode temp = *pathbefore;
@@ -114,9 +114,12 @@ vector<HybridAStarNode*> HybridAStar::getNextNode(VehicleState current, Gear gea
     {
         HybridAStarNode* nextNode = new HybridAStarNode();
         nextNode->state = vehicle.getNextState(current, steer, gear, 1);
-        if(pointInGrid(nextNode->state.posX, nextNode->state.posY, grid->width, grid->height) && grid->isSafe(nextNode->state, 1.5))
+        if(pointInGrid(nextNode->state.posX, nextNode->state.posY, grid->width, grid->height))
         {
-            nodes.push_back(nextNode);
+            if(grid->isSafe(nextNode->state, 1.5))
+            {
+                nodes.push_back(nextNode);
+            }
         }
     }
     if(costToEnd < 10 || ((double) rand() / (RAND_MAX)) > 10/(costToEnd*costToEnd))
@@ -145,7 +148,7 @@ vector<VehicleState> HybridAStar::run(VehicleState start, VehicleState end, Vehi
     HybridAStarNode* startNode = new HybridAStarNode{start};
     priority_queue<HybridAStarNode*, vector<HybridAStarNode*>, HAScomparator> openList;
     vector<HybridAStarNode*> closedList;
-
+    
     openList.push(startNode);
     while(!openList.empty())
     {

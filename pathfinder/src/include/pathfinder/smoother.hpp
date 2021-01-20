@@ -3,7 +3,7 @@
 #include "../vehicle.hpp"
 #include "../grid.hpp"
 //http://ai.stanford.edu/~ddolgov/papers/dolgov_gpp_stair08.pdf
-//Implemented with iterative Gradient Descent because for god's sake i could not figure out conjugate gradient descent
+//Implemented with iterative Gradient Descent
 class Smoother
 {
     float tolerance = .0001;

@@ -81,6 +81,10 @@ vector<vector<Coordinates2D>> Grid::returnNearest()
 }
 bool Grid::isSafe(VehicleState state, float safetyFactor)
 {
+    if(!pointInGrid(state.posX, state.posY, width, height))
+    {
+        return false;
+    }
     int x = (int)state.posX;
     int y = (int)state.posY;
     return distMap[x][y]->dist >= safetyFactor;
