@@ -1,13 +1,13 @@
 #include "include/grid.hpp"
 #include "include/pathfinder/hybridAStar.hpp"
-// #include "include/mapGenerator.hpp"
+#include "include/mapGenerator.hpp"
 
 #include <iostream>
 #include <fstream>
 //grid measurements of 10x10 c
 int main()
 {
-    // mapGenerator map = mapGenerator(50, 50, vector<int>{5,5},7);
+    //mapGenerator map = mapGenerator(50, 50, vector<int>{5,5},7);
     Grid grid = Grid(40, 40);
     grid.addObstacle(35,25);
     grid.addObstacle(36,25);
@@ -26,11 +26,9 @@ int main()
     vector<VehicleState> path = pathfinder.run(start, end, testcar, true);
     ofstream myfile;
     myfile.open("output.txt");
-    myfile << "test\n\n";
-    
+    cout << "TEST" << endl;
     for(VehicleState state : path)
     {
-        myfile << "test\n\n";
         myfile << "(" << state.posX << ", " << state.posY << ", " << state.ori << ", " << state.steer << ", " << state.gear << ")\n";
     }
     myfile.close();
