@@ -3,8 +3,10 @@
 #define _USE_MATH_DEFINES
 #include <vector>
 #include <math.h>
-#include <iostream>
+#include <iostream> 
 #include <algorithm>
+#include <set>
+#include <stdlib.h>
 #include "globals.hpp"
 
 using namespace std;
