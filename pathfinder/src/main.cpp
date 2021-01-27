@@ -34,6 +34,8 @@ int main()
         // VehicleID ObstUpdate [coords relative to current position]
         // VehicleID (StartPos) (EndPos)
         int vehicleID = 0;
+        vector<int> vehiclesToUpdate;
+        vehiclesToUpdate.push_back(vehicleID);
         bool obstRequest = false;
         if(obstRequest)
         {
@@ -48,27 +50,27 @@ int main()
                 vehicleIDMap[vehicleID] = new Vehicle(1, 1);
             }
             vehicleIDMap[vehicleID]->current_path = pathfinder.run(start, end, *vehicleIDMap[vehicleID], true);
-            //COMPARE ALL PATHS IN IDMAP
-            bool collision = false;
-
-            if(collision)
-            {
-                //RUN ANN
-                //SEND PATHS TO VEHICLES AFFECTED
-            }
-            else
-            {
-                // SERVER: WILL SEND PATH TO VEHICLE FORM OF:
-                // X Y ORI GEAR STEER
-                ofstream myfile;
-                myfile.open("output.txt");
-                cout << "TEST" << endl;
-                for(VehicleState state : vehicleIDMap[vehicleID]->current_path)
-                {
-                    myfile << "(" << state.posX << ", " << state.posY << ", " << state.ori << ", " << state.steer << ", " << state.gear << ")\n";
-                }
-                myfile.close();
-            }
         }
+        //COMPARE ALL PATHS IN IDMAP
+        bool collision = false;
+        
+        if(collision)
+        {
+            //RUN ANN
+        }
+        for(int id: vehiclesToUpdate)
+        {
+            // SERVER: WILL SEND PATH TO VEHICLE FORM OF:
+            // X Y ORI STEER GEAR 
+            ofstream myfile;
+            myfile.open("output.txt");
+            cout << "TEST" << endl;
+            for(VehicleState state : vehicleIDMap[id]->current_path)
+            {
+                myfile << "(" << state.posX << ", " << state.posY << ", " << state.ori << ", " << state.steer << ", " << state.gear << ")\n";
+            }
+            myfile.close();
+        }
+
     // }
 }
