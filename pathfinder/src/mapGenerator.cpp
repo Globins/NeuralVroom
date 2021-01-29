@@ -13,8 +13,9 @@ void mapGenerator::generateMap()
 {
     int col_space = this->cols - (this->blocks[1]-1)*this->spacer;
     int row_space = this->rows - (this->blocks[0]-1)*this->spacer;
-    this->blockDimensions[1] = col_space/this->blocks[1];
-    this->blockDimensions[0] = row_space/this->blocks[0];
+    this->blockDimensions.push_back(row_space/this->blocks[0]);
+    this->blockDimensions.push_back(col_space/this->blocks[1]);
+    
     setObsRanges();
 }
 
@@ -38,6 +39,7 @@ void mapGenerator::setObsRanges()
 
 void mapGenerator::setObsCoordinates(vector<vector<int>> xRanges,  vector<vector<int>> yRanges)
 {
+    
     set<vector<int>> freeSpaceX;
     set<vector<int>> freeSpaceY;
     for(vector<int> xRange : xRanges){
@@ -49,13 +51,13 @@ void mapGenerator::setObsCoordinates(vector<vector<int>> xRanges,  vector<vector
                 this->obstacles.insert(vector<int>{x,yRange[1]});
             }
             for(int y = yRange[0]; y < yRange[1]+1; y++){
-                this->obstacles.insert(vector<int>{y,xRange[0]});
-                this->obstacles.insert(vector<int>{y,xRange[1]});
+                this->obstacles.insert(vector<int>{xRange[0],y});
+                this->obstacles.insert(vector<int>{xRange[1],y});
             }
         }
     }
     freeSpaceX.erase(vector<int>{ xRanges[xRanges.size()-1][1]+1, xRanges[xRanges.size()-1][1]+this->spacer-1});
-    freeSpaceX.erase(vector<int>{ yRanges[yRanges.size()-1][1]+1, yRanges[yRanges.size()-1][1]+this->spacer-1});
+    freeSpaceY.erase(vector<int>{ yRanges[yRanges.size()-1][1]+1, yRanges[yRanges.size()-1][1]+this->spacer-1});
     setStreetsIntersections(freeSpaceX,freeSpaceY);
 }
 
@@ -76,36 +78,87 @@ void mapGenerator::setStreetsIntersections(set<vector<int>> freeSpaceX,set<vecto
             this->streets.insert(vector<vector<int>>{x,top});
             this->streets.insert(vector<vector<int>>{left,y});
             this->streets.insert(vector<vector<int>>{right,y});
+
         }
     }
+    
     setStartEndPoints();
 }
 
 
 void mapGenerator::setStartEndPoints()
 {
-    auto itStart = this->streets.cbegin();
-    auto itEnd = this->streets.cbegin();
+    srand (time(NULL));
+    auto itStart = this->streets.begin();
+    auto itStart1 = this->streets.begin();
+    auto itStart2 = this->streets.begin();
+
+    auto itEnd = this->streets.begin();
+    auto itEnd1 = this->streets.begin();
+    auto itEnd2 = this->streets.begin();
+
     advance(itStart, rand()%this->streets.size());
+    advance(itStart1, rand()%this->streets.size());
+    advance(itStart2, rand()%this->streets.size());
+
     advance(itEnd, rand()%this->streets.size());
+    advance(itEnd1, rand()%this->streets.size());
+    advance(itEnd2, rand()%this->streets.size());
+
     vector<vector<int>> randomStreetStart = *itStart;
+    vector<vector<int>> randomStreetStart1 = *itStart1;
+    vector<vector<int>> randomStreetStart2 = *itStart2;
+
     vector<vector<int>> randomStreetEnd = *itEnd;
+    vector<vector<int>> randomStreetEnd1 = *itEnd1;
+    vector<vector<int>> randomStreetEnd2 = *itEnd2;
 
-    this->startPoint.push_back(rand()%(randomStreetStart[0][1] - randomStreetStart[0][0]) + randomStreetStart[0][0]);
-    this->startPoint.push_back(rand()%(randomStreetStart[1][1] - randomStreetStart[1][0]) + randomStreetStart[1][0]);
-    this->startPoint.push_back(rand()%360);
+    vector<int> s;
+    vector<int> s1;
+    vector<int> s2;
 
-    this->endPoint.push_back(rand()%(randomStreetEnd[0][1] - randomStreetEnd[0][0]) + randomStreetEnd[0][0]);
-    this->endPoint.push_back(rand()%(randomStreetEnd[1][1] - randomStreetEnd[1][0]) + randomStreetEnd[1][0]);
-    this->endPoint.push_back(rand()%360);
+    vector<int> e;
+    vector<int> e1;
+    vector<int> e2;
+    s.push_back(rand()%(randomStreetStart[0][1] - randomStreetStart[0][0]) + randomStreetStart[0][0]);
+    s.push_back(rand()%(randomStreetStart[1][1] - randomStreetStart[1][0]) + randomStreetStart[1][0]);
+    s.push_back(rand()%360);
+
+    s1.push_back(rand()%(randomStreetStart1[0][1] - randomStreetStart1[0][0]) + randomStreetStart1[0][0]);
+    s1.push_back(rand()%(randomStreetStart1[1][1] - randomStreetStart1[1][0]) + randomStreetStart1[1][0]);
+    s1.push_back(rand()%360);
+
+    s2.push_back(rand()%(randomStreetStart2[0][1] - randomStreetStart2[0][0]) + randomStreetStart2[0][0]);
+    s2.push_back(rand()%(randomStreetStart2[1][1] - randomStreetStart2[1][0]) + randomStreetStart2[1][0]);
+    s2.push_back(rand()%360);
+
+    e.push_back(rand()%(randomStreetEnd[0][1] - randomStreetEnd[0][0]) + randomStreetEnd[0][0]);
+    e.push_back(rand()%(randomStreetEnd[1][1] - randomStreetEnd[1][0]) + randomStreetEnd[1][0]);
+    e.push_back(rand()%360);
+
+    e1.push_back(rand()%(randomStreetEnd1[0][1] - randomStreetEnd1[0][0]) + randomStreetEnd1[0][0]);
+    e1.push_back(rand()%(randomStreetEnd1[1][1] - randomStreetEnd1[1][0]) + randomStreetEnd1[1][0]);
+    e1.push_back(rand()%360);
+
+    e2.push_back(rand()%(randomStreetEnd2[0][1] - randomStreetEnd2[0][0]) + randomStreetEnd2[0][0]);
+    e2.push_back(rand()%(randomStreetEnd2[1][1] - randomStreetEnd2[1][0]) + randomStreetEnd2[1][0]);
+    e2.push_back(rand()%360);
+
+    startPoints.push_back(s);
+    startPoints.push_back(s1);
+    startPoints.push_back(s2);
+
+    endPoints.push_back(e);
+    endPoints.push_back(e1);
+    endPoints.push_back(e2);
 }
 
 
-vector<int> mapGenerator::getStartPoint(){
-    return this->startPoint;
+vector<vector<int>> mapGenerator::getStartPoints(){
+    return this->startPoints;
 }
-vector<int> mapGenerator::getEndPoint(){
-    return this->endPoint;
+vector<vector<int>> mapGenerator::getEndPoints(){
+    return this->endPoints;
 }
 set<vector<int>> mapGenerator::getObstacles(){
     return this->obstacles;
@@ -118,12 +171,42 @@ set<vector<vector<int>>> mapGenerator::getIntersections(){
 }
 
 std::ostream& operator<<(std::ostream &out, const mapGenerator &m){
-    out << "Start Point: X: " << m.startPoint[0] << " Y: " << m.startPoint[1] << " O: " << m.startPoint[2]<< "\n";
-    out << "End Point: X: " << m.endPoint[0] << " Y: " << m.endPoint[1] << " O: " << m.endPoint[2] << "\n";
-    out << "Block Dimensions" << m.blockDimensions[0] << " " << m.blockDimensions[1] << "\n";
+    out << "Start Points: " << "\n";
+    for(vector<int> startPoint: m.startPoints){
+        out << "\t( " << startPoint[0] << ',' << startPoint[1] << ") " << startPoint[2] << "\n";
+    }
+    out << "End Points:" << "\n";
+    for(vector<int> endPoint: m.endPoints){
+        out << "\t( " << endPoint[0] << ',' << endPoint[1] << ") " << endPoint[2] << "\n";
+    }
+    out << "Block Dimensions: " << m.blockDimensions[0] << " " << m.blockDimensions[1] << "\n";
     out << "obs coordinates: \n";
     for(vector<int> obstacle: m.obstacles){
-        out << "\tx: " << obstacle[0] << " y: " << obstacle[1] << "\n";
+        out << "(" << obstacle[0] << "," << obstacle[1] << "),";
+    }
+    out << "\n";
+    out << "Streets: " << m.streets.size() << "\n";
+    for(vector<vector<int>> street : m.streets){
+        for(int x = street[0][0]; x < street[0][1]+1; x++){
+            cout << "(" << x << "," << street[1][0] << "), ";
+            cout << "(" << x << "," << street[1][1] << "), ";
+        }
+        for(int y = street[1][0]; y < street[1][1]+1; y++){
+            cout << "(" << street[0][0] << "," << y << "), ";
+            cout << "(" << street[0][1] << "," << y << "), ";
+        }
+    }
+    out << "\n";
+    out << "Intersections: " << m.intersections.size() << "\n";
+    for(vector<vector<int>> intersection : m.intersections){
+        for(int x = intersection[0][0]; x < intersection[0][1]+1; x++){
+            cout << "(" << x << "," << intersection[1][0] << "), ";
+            cout << "(" << x << "," << intersection[1][1] << "), ";
+        }
+        for(int y = intersection[1][0]; y < intersection[1][1]+1; y++){
+            cout << "(" << intersection[0][0] << "," << y << "), ";
+            cout << "(" << intersection[0][1] << "," << y << "), ";
+        }
     }
     return out;
 }
