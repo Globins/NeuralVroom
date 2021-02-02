@@ -53,10 +53,11 @@ int main()
         }
         //COMPARE ALL PATHS IN IDMAP
         bool collision = false;
-        
+        //add affected vehicles to vehiclestoupdate
         if(collision)
         {
-            //RUN ANN
+            //RUN ANN on all vehicles affected
+            
         }
         for(int id: vehiclesToUpdate)
         {
