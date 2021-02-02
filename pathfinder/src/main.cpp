@@ -8,7 +8,10 @@
 //grid measurements of 10x10 c
 int main()
 {
-    //mapGenerator map = mapGenerator(50, 50, vector<int>{5,5},7);
+    // printf("test1\n");
+    // mapGenerator map = mapGenerator(50, 50, vector<int>{3,3},7);
+    // printf("test2\n");
+    // cout << map << endl;
     Grid grid = Grid(40, 40);
     grid.addObstacle(35,25);
     grid.addObstacle(36,25);
@@ -65,7 +68,7 @@ int main()
             // X Y ORI STEER GEAR 
             ofstream myfile;
             myfile.open("output.txt");
-            cout << "TEST" << endl;
+            cout << "TEST2" << endl;
             for(VehicleState state : vehicleIDMap[id]->current_path)
             {
                 myfile << "(" << state.posX << ", " << state.posY << ", " << state.ori << ", " << state.steer << ", " << state.gear << ")\n";
