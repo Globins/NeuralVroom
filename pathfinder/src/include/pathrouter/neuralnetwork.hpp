@@ -35,7 +35,7 @@ public:
     NeuralNet(const vector<unsigned> &topology);
     void feedForward(const vector<double> &inputVals);
     void backProp(const vector<double> &argetVals);
-    void getResults(const vector<double> &resultVals) const;
+    void getResults(vector<double> &resultVals) const;
 private:
-    vector<Layer> m_layers;
+    vector<Layer> m_layers; 
 };

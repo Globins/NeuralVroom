@@ -2,8 +2,11 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="1ecafae6-d38b-4786-9545-170a301a354f" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/main.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/main.ipynb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/output.txt" beforeDir="false" afterPath="$PROJECT_DIR$/output.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pathfinder/PathFinder.exe" beforeDir="false" afterPath="$PROJECT_DIR$/pathfinder/PathFinder.exe" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pathfinder/output.txt" beforeDir="false" afterPath="$PROJECT_DIR$/pathfinder/output.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pathfinder/src/include/mapGenerator.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/pathfinder/src/include/mapGenerator.hpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pathfinder/src/main.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/pathfinder/src/main.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pathfinder/src/mapGenerator.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/pathfinder/src/mapGenerator.cpp" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -16,10 +19,10 @@
   <component name="ProjectId" id="1lODcB9PbIFMjUfnlR17rGQA0XZ" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
-    <option name="showExcludedFiles" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
   <component name="PropertiesComponent">
+    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
@@ -38,6 +41,7 @@
       <updated>1607459320380</updated>
       <workItem from="1607459323891" duration="1239000" />
       <workItem from="1607468783942" duration="792000" />
+      <workItem from="1612404992350" duration="17000" />
     </task>
     <servers />
   </component>

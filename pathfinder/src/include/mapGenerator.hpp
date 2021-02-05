@@ -3,19 +3,24 @@
 
 #include "utils.hpp"
 #include <time.h> 
+#include <map>
 
 
 
 class mapGenerator
 {
 private:
-    vector<vector<int>> startPoints;
-    vector<vector<int>> endPoints;
+    vector<vector<float>> startPoints;
+    vector<vector<float>> endPoints;
     vector<int> blocks;
     vector<int> blockDimensions;
     set<vector<int>> obstacles;
     set<vector<vector<int>>> streets;
     set<vector<vector<int>>> intersections;
+    vector<vector<int>> mp;
+
+
+    int vehicleNum;
     int spacer;
     int rows;
     int cols;
@@ -27,13 +32,14 @@ private:
     void setStartEndPoints();
 public:
 
-    mapGenerator(int rows, int cols, vector<int> blocks, int spacer);
+    mapGenerator(int rows, int cols, vector<int> blocks, int spacer,int vehicleNum);
     friend std::ostream& operator<<(std::ostream &out, const mapGenerator &m);
-    vector<vector<int>> getStartPoints();
-    vector<vector<int>> getEndPoints();
+    vector<vector<float>> getStartPoints();
+    vector<vector<float>> getEndPoints();
     set<vector<int>> getObstacles();
     set<vector<vector<int>>> getStreets();
     set<vector<vector<int>>> getIntersections();
+    vector<vector<int>> getMap(){ return this->mp; };
     ~mapGenerator() = default;
     
     

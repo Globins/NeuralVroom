@@ -56,3 +56,12 @@ void NeuralNet::feedForward(const vector<double> &inputVals)
         }
     }
 }
+
+void NeuralNet::getResults(vector<double> &resultVals) const{
+    resultVals.clear();
+    for(unsigned n = 0; n < m_layers.back().size() -1; n++){
+        resultVals.push_back(m_layers.back()[n].getOutputVal());
+    }
+
+
+}
