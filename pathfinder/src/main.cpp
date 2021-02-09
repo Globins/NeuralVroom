@@ -49,61 +49,66 @@ vector<vector<float>> getSurroundingCoords(vector<float> currentPos, float dist)
 vector<vector<float>> getSlopes(vector<float> start, vector<vector<float>> surroundingCoords){
     vector<vector<float>> slopes;
     for(vector<float> coord : surroundingCoords){
-        float rise = (coord[1] - start[1])/(coord[0] - start[0]);
-        float run = (coord[0] - start[0])/(coord[1] - start[1]);
+        float rise = abs(coord[1] - start[1]);
+        float run = abs(coord[0] - start[0]);
         slopes.push_back(vector<float>{abs(rise), abs(run)});        
     }
     return slopes;
 }
 
 vector<double> getInputs(vector<vector<int>> m, Vehicle* vehicle, vector<float> currentPos, vector<float> endPos){
-    float dist = 3.0;
+    float dist = 3.1;
     vector<float> inputs;
     vector<vector<float>> surroundingCoords = getSurroundingCoords(currentPos, dist);
     vector<vector<float>> slopes = getSlopes(currentPos, surroundingCoords);
     vector<double> distances;
     for(int i = 0; i < slopes.size(); i++){
+        // cout << "("<< surroundingCoords[i][0] << "," << surroundingCoords[i][1] << "),";
         float tempX = currentPos[0];
         float tempY = currentPos[1];
         for(int j = 0; j < dist*2; j++){
             if(m[roundf(tempY)][roundf(tempX)] == 1){
                 distances.push_back( (dist*2 - j)/(dist*2)  );
+                cout << tempY << " " << tempX << " " << surroundingCoords[i][2] << endl;
                 break;
             }
             if(surroundingCoords[i][2] > 0 && surroundingCoords[i][2] < 180 ){
-                tempY -= slopes[i][0]/2;
+                tempY -= slopes[i][0]/(dist*2);
             }
             else{
-                tempY += slopes[i][0]/2;
+                tempY += slopes[i][0]/(dist*2);
             }
             if(surroundingCoords[i][2] > 90 && surroundingCoords[i][2] < 270 ){
-                tempX -= slopes[i][1]/2;
+                tempX -= slopes[i][1]/(dist*2);
             }
             else{
-                tempX += slopes[i][1]/2;
+                tempX += slopes[i][1]/(dist*2);
             }
             if(tempX >= 50 || tempY >= 50 || tempX < 0 || tempY < 0){
-                distances.push_back(0);
+                distances.push_back(1);
+                cout << tempY << " " << tempX << " " << surroundingCoords[i][2] << endl;
                 break;
             }
         }
         if(distances.size() != i+1){
             distances.push_back(0);
+            
         }
     }
-    // cout << distances.size() << " " << slopes.size() << " " << surroundingCoords.size() << endl;
-    // for(int i = 0; i < distances.size(); i++){
-    //     cout <<  surroundingCoords[i][0] << " " << surroundingCoords[i][1] << " " << surroundingCoords[i][2] << endl;
-    //     cout << "\t" << slopes[i][0] << " " << slopes[i][1] << endl;
-    //     cout << "\t" << distances[i] << endl;
-    // }
-    // m[currentPos[1]][currentPos[0]] = 9;
-    // for(int i = 0; i < m.size(); i++){
-    //     for(int y = 0; y < m[i].size(); y++){
-    //         cout << m[i][y] << " ";
-    //     }
-    //     cout << endl;
-    // }
+    m[currentPos[1]][currentPos[0]] = 9;
+    cout << currentPos[0] << " " << currentPos[1] << endl;
+    for(int i = 0; i < distances.size(); i++){
+        cout <<  surroundingCoords[i][0] << " " << surroundingCoords[i][1] << " " << surroundingCoords[i][2] << endl;
+        cout << "\t" << slopes[i][0] << " " << slopes[i][1] << endl;
+        cout << "\t" << distances[i] << endl;
+    }
+    m[currentPos[1]][currentPos[0]] = 9;
+    for(int i = 0; i < m.size(); i++){
+        for(int y = 0; y < m[i].size(); y++){
+            cout << m[i][y] << " ";
+        }
+        cout << endl;
+    }
     return distances;
 }
 
@@ -112,7 +117,7 @@ int main()
 {
     int numVehicles = 1;
     mapGenerator m = mapGenerator(50, 50, vector<int>{3,3},7,numVehicles);
-
+    // cout << m << endl;
     Grid grid = Grid(55, 55);
     
     cout << "adding obstacles" << endl;
@@ -125,7 +130,7 @@ int main()
     //Neural Network training will go here
     //it will run randomly positioned car positions of varied amount of cars in a random map for 10k times
     map<int, Vehicle*> vehicleIDMap;
-    vector<unsigned> topology {24, 12, 3};
+    vector<unsigned> topology {24, 12, 6, 3, 3};
 
     // PATH WILL BE (X, Y, ORI, GEAR, STEER, TIMEATNODE)
     
