@@ -18,7 +18,6 @@ void Neuron::feedForward(const Layer &prevLayer)
     }
     m_outputVal = Neuron::transferFunction(sum);
 }
-
 double Neuron::transferFunction(double x)
 {
     return tanh(x);
@@ -40,7 +39,6 @@ NeuralNet::NeuralNet(const vector<unsigned> &topology)
         }
     }
 }
-
 void NeuralNet::feedForward(const vector<double> &inputVals)
 {
     for(unsigned i = 0; i < inputVals.size(); i++)
@@ -56,7 +54,6 @@ void NeuralNet::feedForward(const vector<double> &inputVals)
         }
     }
 }
-
 void NeuralNet::getResults(vector<double> &resultVals) const{
     resultVals.clear();
     for(unsigned n = 0; n < m_layers.back().size() -1; n++){
@@ -64,4 +61,27 @@ void NeuralNet::getResults(vector<double> &resultVals) const{
     }
 
 
+}
+
+vector<VehicleState> NeuralNet::run(Grid* grid, Vehicle* vehicle, VehicleState startPos, VehicleState endPos)
+{
+    vector<VehicleState> path;
+    VehicleState currentPos = startPos; 
+    path.push_back(currentPos);
+
+    while(grid->isSafe(currentPos, 1.5) || areEquivalentStates(currentPos, endPos))
+    {
+        vector<double> inputs = vehicle->getDistanceFromObstacles(grid->returnRawMap(), currentPos); // get raw grid map
+        feedForward(inputs);
+        vector<double> results;
+        getResults(results);
+        //steer and gear here
+        //currentPos = vehicle->current_path(currentPos, results[0], results[1], results[2]);
+        path.push_back(currentPos);
+    }
+    return path;
+}
+bool NeuralNet::areEquivalentStates(VehicleState comp, VehicleState other)
+{
+    return comp.posX == other.posX && comp.posY ==  other.posY && comp.ori == other.ori && comp.gear == other.gear;
 }

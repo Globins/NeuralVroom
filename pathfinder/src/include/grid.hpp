@@ -10,6 +10,7 @@ public:
     void addObstacle(int x, int y);
     void removeObstacle(int x, int y);
     void refreshMap();
+    vector<vector<int>> returnRawMap();
     vector<vector<float>> returnDistMap();
     vector<vector<float>> returnVoroDistMap();
     vector<vector<bool>> returnVoroMap();

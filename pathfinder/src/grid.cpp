@@ -37,6 +37,21 @@ vector<vector<float>> Grid::returnDistMap()
     }
     return result;
 }
+vector<vector<int>> Grid::returnRawMap()
+{
+    vector<vector<int>> result;
+    vector<vector<float>> dist = returnDistMap();
+    for(vector<float> row : dist)
+    {
+        vector<int> pushRow;
+        for(float col : row)
+        {
+            pushRow.push_back(col == 0);
+        }
+        result.push_back(pushRow);
+    }
+    return result;
+}
 vector<vector<float>> Grid::returnVoroDistMap()
 {
     vector<vector<float>> result;

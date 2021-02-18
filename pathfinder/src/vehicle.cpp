@@ -42,3 +42,88 @@ VehicleState Vehicle::getNextState(VehicleState current, Steer steer, Gear gear,
     current.gear = gear;
     return current;
 }
+
+vector<Coordinates3D> Vehicle::getSurroundingCoords(Coordinates3D currentPos, float dist){
+    float currentOrientation = currentPos.radians;
+    vector<Coordinates3D> surroundingCoords;
+    for(int i = 0; i < 24; i++){
+        if(currentOrientation < M_PI_2){
+            float y = sin(currentOrientation)*dist;
+            float x = cos(currentOrientation)*dist;
+            surroundingCoords.push_back(Coordinates3D{currentPos.x + x, currentPos.y - y, currentOrientation});
+        }
+        else if(currentOrientation >= M_PI_2 && currentOrientation < M_PI){
+            float tempOrientation = currentOrientation - M_PI_2;
+            float y = cos(tempOrientation)*dist;
+            float x = sin(tempOrientation)*dist;
+            surroundingCoords.push_back(Coordinates3D{currentPos.x - x, currentPos.y-y, currentOrientation});
+        }
+        else if(currentOrientation >= M_PI && currentOrientation < 1.5*M_PI){
+            float tempOrientation = currentOrientation - M_PI;
+            float y = sin(tempOrientation)*dist;
+            float x = cos(tempOrientation)*dist;
+            surroundingCoords.push_back(Coordinates3D{currentPos.x - x, currentPos.y + y, currentOrientation});
+        }
+        else if(currentOrientation >= 1.5*M_PI && currentOrientation < 2*M_PI){
+            float tempOrientation = currentOrientation - 1.5*M_PI;
+            float y = cos(tempOrientation)*dist;
+            float x = sin(tempOrientation)*dist;
+            surroundingCoords.push_back(Coordinates3D{currentPos.x + x, currentPos.y + y, currentOrientation});
+        }
+        currentOrientation += M_PI/12;
+        if (currentOrientation >= 2*M_PI)
+            currentOrientation -= 2*M_PI;
+    }
+    return surroundingCoords;
+}
+
+vector<vector<float>> Vehicle::getSlopes(Coordinates3D start, vector<Coordinates3D> surroundingCoords){
+    vector<vector<float>> slopes;
+    for(Coordinates3D coord : surroundingCoords){
+        float rise = abs(coord.y - start.y);
+        float run = abs(coord.x - start.x);
+        slopes.push_back(vector<float>{abs(rise), abs(run)});        
+    }
+    return slopes;
+}
+
+vector<double> Vehicle::getDistanceFromObstacles(vector<vector<int>> m, VehicleState currentState){
+    float dist = 3.1;
+    Coordinates3D currentPos = Coordinates3D{currentState.posX, currentState.posY, currentState.ori};
+    vector<Coordinates3D> surroundingCoords = getSurroundingCoords(currentPos, dist);
+    vector<vector<float>> slopes = getSlopes(currentPos, surroundingCoords);
+    vector<double> distances;
+    for(int i = 0; i < slopes.size(); i++){
+        float tempX = currentPos.x;
+        float tempY = currentPos.y;
+        for(int j = 0; j < dist*2; j++){
+            if(m[roundf(tempY)][roundf(tempX)] == 1){
+                distances.push_back( (dist*2 - j)/(dist*2)  );
+                break;
+            }
+            if(surroundingCoords[i].radians > 0 && surroundingCoords[i].radians < M_PI ){
+                tempY -= slopes[i][0]/(dist*2);
+            }
+            else{
+                tempY += slopes[i][0]/(dist*2);
+            }
+            if(surroundingCoords[i].radians > M_PI_2 && surroundingCoords[i].radians < 1.5*M_PI ){
+                tempX -= slopes[i][1]/(dist*2);
+            }
+            else{
+                tempX += slopes[i][1]/(dist*2);
+            }
+            if(tempX >= 50 || tempY >= 50 || tempX < 0 || tempY < 0){
+                distances.push_back(1);
+                break;
+            }
+        }
+        if(distances.size() != i+1){
+            distances.push_back(0);
+            
+        }
+    }
+    return distances;
+}
+
+//vector<double> inputs = getInputs(m.getMap(), vehicleIDMap[id], startPoints[id], endPoints[id]);

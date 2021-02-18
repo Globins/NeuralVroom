@@ -1,4 +1,8 @@
 
+class Genotype
+{
+
+};
 
 class GeneticAglorithm
 {

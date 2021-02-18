@@ -36,6 +36,9 @@ public:
     void feedForward(const vector<double> &inputVals);
     void backProp(const vector<double> &argetVals);
     void getResults(vector<double> &resultVals) const;
+    vector<VehicleState> run(Grid* grid, Vehicle* vehicle, VehicleState startPos, VehicleState endPos);
+    bool areEquivalentStates(VehicleState comp, VehicleState other);
+
 private:
     vector<Layer> m_layers; 
 };
