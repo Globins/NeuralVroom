@@ -8,8 +8,8 @@ NeuralNet EvolutionManager::train(const vector<unsigned> &topology, Grid* grid, 
 void EvolutionManager::startEvolution()
 {
     NeuralNet nn = NeuralNet(topology);
-    GeneticAglorithm ga = GeneticAlgorithm(nn.weightCount, 3);
-    ga.start();
+    //GeneticAglorithm ga = GeneticAlgorithm(nn.weightCount, 3);
+    //ga.start();
     genotypesSaved = 0;
 
     // if(saveData)
