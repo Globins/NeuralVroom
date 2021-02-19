@@ -39,6 +39,9 @@ public:
     vector<VehicleState> run(Grid* grid, Vehicle* vehicle, VehicleState startPos, VehicleState endPos);
     bool areEquivalentStates(VehicleState comp, VehicleState other);
 
+    int weightCount;
+
 private:
     vector<Layer> m_layers; 
+    
 };

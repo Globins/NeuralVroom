@@ -23,7 +23,7 @@ int main()
     //Neural Network training will go here
     vector<unsigned> topology {24, 12, 6, 3, 3};
     EvolutionManager trainer = EvolutionManager();
-    NeuralNet net = trainer.train(topology);
+    NeuralNet net = trainer.train(topology, &grid, false);
 
 
     map<int, Vehicle*> vehicleIDMap;
@@ -57,7 +57,7 @@ int main()
                     vehicleIDMap[id] = new Vehicle(1, 1);
                 }
                 vehicleIDMap[id]->current_path = pathfinder.run(start, end, *vehicleIDMap[id], true);
-                vector<double> inputs = vehicleIDMap[id]->getDistanceFromObstacles(m.getMap(), start);
+                vector<double> inputs = vehicleIDMap[id]->getDistanceFromObstacles(grid.returnRawMap(), start);
                 //COMPARE ALL PATHS IN IDMAP
                 bool collision = false;
                 //loop through all paths and see if one is the same
