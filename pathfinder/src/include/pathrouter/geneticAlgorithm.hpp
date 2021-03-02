@@ -44,7 +44,6 @@ class GeneticAlgorithm
         void start(const int trainAmount);
         void evaluation();
         vector<Genotype> getPopulation();
-        NeuralNet GenotypeParamsToNeuralNet(vector<Genotype> currentPop);
         void printPopulation();
         
     private:

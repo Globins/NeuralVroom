@@ -26,7 +26,13 @@ double Neuron::transferFunctionDerivative(double x)
 {
     return 1 - x*x;
 }
-
+void Neuron::modifyWeight(vector<double> newWeights)
+{
+    for(int i = 0; i < m_outputWeights.size(); i++)
+    {
+        m_outputWeights[i].weight = newWeights[i];
+    }
+}
 
 //----------------------------------------------------------------------------------------------------------------------------------
 NeuralNet::NeuralNet(const vector<unsigned> &topology)
@@ -35,12 +41,13 @@ NeuralNet::NeuralNet(const vector<unsigned> &topology)
     for(unsigned layerNum = 0; layerNum < numLayers; layerNum++)
     {
         m_layers.push_back(Layer());
+        int neuronCount = topology[layerNum];
         unsigned numOutputs = layerNum == topology.size()-1 ? 0 : topology[layerNum+1];
         for(unsigned neuronNum = 0; neuronNum <= topology[layerNum]; neuronNum++)
         {
-            weightCount++;
             m_layers.back().push_back(Neuron(numOutputs, neuronNum));
         }
+        weightCount += layerNum == topology.size()-1 ? 0 : (topology[layerNum]+1)*numOutputs;
     }
 }
 void NeuralNet::feedForward(const vector<double> &inputVals)
@@ -63,9 +70,28 @@ void NeuralNet::getResults(vector<double> &resultVals) const{
     for(unsigned n = 0; n < m_layers.back().size() -1; n++){
         resultVals.push_back(m_layers.back()[n].getOutputVal());
     }
-
-
 }
+
+void NeuralNet::GenotypeParamsToWeights(const vector<float> &population)
+{
+    int index = 0;
+    for(unsigned layerNum = 0; layerNum < m_layers.size(); layerNum++)
+    {
+        unsigned numOutputs = layerNum == m_layers.size()-1 ? 0 : m_layers[layerNum+1].size();
+        for(unsigned neuronNum = 0; neuronNum <= m_layers[layerNum].size(); neuronNum++)
+        {
+            vector<double> newWeights;
+            for(int i = 0; i < numOutputs; i++)
+            {
+                newWeights.push_back(population[index]);
+                index++;
+            }
+            m_layers[layerNum][neuronNum].modifyWeight(newWeights);
+        }
+    }
+}
+
+
 VehicleState NeuralNet::processResults(Vehicle* vehicle, VehicleState state, const vector<double> &resultVals)
 {
     Steer steer = Straight;

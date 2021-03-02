@@ -17,6 +17,7 @@ public:
     void setOutputVal(double val) { m_outputVal = val; };
     double getOutputVal(void) const { return m_outputVal; };
     void feedForward(const Layer &prevLayer);
+    void modifyWeight(vector<double> newWeights);
 private:
     unsigned m_myIndex;
     static double transferFunction(double x);
@@ -36,11 +37,12 @@ public:
     void feedForward(const vector<double> &inputVals);
     void backProp(const vector<double> &argetVals);
     void getResults(vector<double> &resultVals) const;
-    
+
     VehicleState processResults(Vehicle* vehicle, VehicleState state, const vector<double> &resultVals);
     vector<VehicleState> run(Grid* grid, Vehicle* vehicle, VehicleState startPos, VehicleState endPos);
     bool areEquivalentStates(VehicleState comp, VehicleState other);
 
+    void GenotypeParamsToWeights(const vector<float> &population);
     int weightCount = 0;
 
 private:

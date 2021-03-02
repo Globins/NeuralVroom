@@ -11,7 +11,6 @@ void Genotype::setRandomParams(float minVal, float maxVal)
     for(int i = 0; i < params.size(); i++)
     {
         params[i] = (((double) rand() / (RAND_MAX)) *range + minVal);
-        cout << params[i] << endl;
     }
 }
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -37,6 +36,7 @@ GeneticAlgorithm::GeneticAlgorithm(int genotypeParamCount, int populationSize, c
     this->populationSize = populationSize;
     this->topology = topology;
     currentPopulation.resize(populationSize, Genotype(vector<float>(genotypeParamCount, 0)));
+    cout << genotypeParamCount << endl;
     GenerationCount = 1;
     sortPopulation = true;
 }

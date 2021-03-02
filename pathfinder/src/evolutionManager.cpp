@@ -11,7 +11,8 @@ NeuralNet EvolutionManager::train(const vector<unsigned> &topology, const int tr
     {
         writeResultsToFile(ga.getPopulation());
     }
-    //return ga.GenotypeParamsToNeuralNet(ga.getPopulation());
+    nn.GenotypeParamsToWeights(ga.getPopulation()[0].params);
+    return nn;
 }
 
 void EvolutionManager::writeResultsToFile(vector<Genotype> currentPop)
