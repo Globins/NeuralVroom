@@ -23,7 +23,7 @@ int main()
     //Neural Network training will go here
     vector<unsigned> topology {24, 12, 6, 3, 3};
     EvolutionManager trainer = EvolutionManager();
-    NeuralNet net = trainer.train(topology, &grid, false);
+    NeuralNet net = trainer.train(topology, 100, false);
 
 
     map<int, Vehicle*> vehicleIDMap;

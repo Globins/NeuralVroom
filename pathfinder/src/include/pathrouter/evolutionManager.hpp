@@ -1,10 +1,12 @@
 #include "neuralnetwork.hpp"
 #include "geneticAlgorithm.hpp"
 #include "../grid.hpp"
+#include "../mapGenerator.hpp"
+#include "../vehicle.hpp"
 class EvolutionManager
 {
 public:
-    NeuralNet train(const vector<unsigned> &topology, Grid* Grid, bool saveData);
+    NeuralNet train(const vector<unsigned> &topology, int trainAmount, bool saveData);
     void startEvolution();
 private:
     void writeResultsToFile();
@@ -13,5 +15,8 @@ private:
 
     vector<unsigned> topology;
     int genotypesSaved;
+    int trainAmount;
+    bool saveData;
 
 };
+//EVAL == % DIJKSTRA DISTANCE FROM ENDGOAL

@@ -30,7 +30,6 @@ double Neuron::transferFunctionDerivative(double x)
 
 //----------------------------------------------------------------------------------------------------------------------------------
 NeuralNet::NeuralNet(const vector<unsigned> &topology)
-
 {
     unsigned numLayers = topology.size();
     for(unsigned layerNum = 0; layerNum < numLayers; layerNum++)

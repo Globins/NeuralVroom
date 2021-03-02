@@ -1,5 +1,6 @@
 #include "../utils.hpp"
-
+#include "../vehicle.hpp"
+#include "../pathrouter/neuralnetwork.hpp"
 class Genotype
 {
 public:
@@ -22,6 +23,17 @@ struct GENOcomparator
     }
 };
 
+struct Agent
+{
+public:
+    Agent(Genotype genotype, vector<float> topology, VehicleState state);
+    void update();
+    void processNNresults(vector<double> nnResults);
+    Vehicle vehicleStatus;
+    VehicleState vehicleState;
+    NeuralNet nn;
+    bool hasCrashed = false;
+};
 //--------------------------------------------------------------------------------------------------------------------------------------------
 class GeneticAlgorithm
 {
@@ -45,6 +57,8 @@ class GeneticAlgorithm
         float defaultMutationProb = .3;
         float defaultMutationAmount = 2;
         float defaultMutationPerc = 1;
+        
+        vector<Agent> agents;
 
         vector<Genotype> currentPopulation;
         int populationSize;
@@ -54,3 +68,4 @@ class GeneticAlgorithm
 
 
 };
+

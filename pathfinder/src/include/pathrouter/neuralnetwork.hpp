@@ -22,7 +22,7 @@ private:
     static double transferFunction(double x);
     static double transferFunctionDerivative(double x);
     static double randomWeight(void) { return rand() / double(RAND_MAX);}
-    double m_outputVal;
+    double m_outputVal; 
     vector<Connection> m_outputWeights;
     
 };
@@ -39,9 +39,12 @@ public:
     vector<VehicleState> run(Grid* grid, Vehicle* vehicle, VehicleState startPos, VehicleState endPos);
     bool areEquivalentStates(VehicleState comp, VehicleState other);
 
-    int weightCount;
+    int weightCount = 0;
 
 private:
     vector<Layer> m_layers; 
     
 };
+
+
+//will be evaluated on how it goes straight for a certain amount of distance

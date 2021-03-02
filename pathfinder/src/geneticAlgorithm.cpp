@@ -14,7 +14,36 @@ void Genotype::setRandomParams(float minVal, float maxVal)
     }
 }
 //----------------------------------------------------------------------------------------------------------------------------------
-
+Agent::Agent(Genotype genotype, vector<float> topology, VehicleState state)
+{
+    vehicleState = state;
+    nn = NeuralNet(topology);
+    vehicleStatus = Vehicle(10, 16.5);
+}
+void Agent::update()
+{
+    vector<double> sensorInfo = vehicleStatus.getDistanceFromObstacles();
+    nn.feedForward(sensorInfo);
+    vector<double> results;
+    nn.getResults(results);
+    processNNResults(results); //set new location for neural network
+    nonHolonomicRelaxedCostMap() //current position, start position, get PercDone, add eval to geno
+}
+void Agent::processNNresults(vector<double> nnResults)
+{
+    Steer steer = Straight;
+    if(nnResults[0] < .33)
+    {
+        steer = Left;
+    }
+    else if(nnResults[0 < .66])
+    {
+        steer = Right;
+    }
+    Gear gear = ( nnResults[1] > .5f) ? Forward : Backward;
+    state = vehicleStatus.getNextState(state, steer, gear, nnResults[2]);
+}
+//----------------------------------------------------------------------------------------------------------------------------------
 GeneticAlgorithm::GeneticAlgorithm(int genotypeParamCount, int populationSize)
 {
     this->populationSize = populationSize;
@@ -40,7 +69,26 @@ void GeneticAlgorithm::initPopulation(vector<Genotype> currentPop)
 }
 void GeneticAlgorithm::evaluation(vector<Genotype> currentPop)
 {
-
+    agents.clear();
+    //refresh grid/start points
+    vector<float> topology = {24, 12, 12, 6,  3};
+    for(Genotype geno : currentPopulation)
+    {
+        agents.push_back(Agent(geno, topology));
+    }
+    int vehiclesCrashed = 0;
+    while(vehiclesCrashed < currentPopulation.size())
+    {
+        for(Agent agent : agents)
+        {
+            if(agent.hasCrashed)
+            {
+                continue;
+            }
+            agent.update();
+        }
+    }
+    evaluationFinished();
 }
 void GeneticAlgorithm::evaluationFinished()
 {
@@ -78,9 +126,28 @@ void GeneticAlgorithm::fitnessCalculation(vector<Genotype> currentPop)
 vector<Genotype> GeneticAlgorithm::selection(vector<Genotype> currentPop)
 {
     vector<Genotype> intermediatePopulation;
-    intermediatePopulation.push_back(currentPop[0]);
-    intermediatePopulation.push_back(currentPop[1]);
-    intermediatePopulation.push_back(currentPop[2]);
+    for(Genotype geno : currentPop)
+    {
+        if(geno.fitness < 1)
+        {
+            break;
+        }
+        else
+        {
+            for(int i = 0; i < (int)geno.fitness; i++)
+            {
+                intermediatePopulation.push_back(Genotype(geno.params));
+            }
+        }
+    }
+    for(Genotype geno : currentPop)
+    {
+        float remainder = geno.fitness - (int)geno.fitness;
+        if(((double) rand() / (RAND_MAX)) < remainder)
+        {
+            intermediatePopulation.push_back(Genotype(geno.params));
+        }
+    }
 
     return intermediatePopulation;
 }
@@ -91,9 +158,18 @@ vector<Genotype> GeneticAlgorithm::recombination(vector<Genotype> intermediatePo
         throw new invalid_argument("Intermediate population too small");
     }
     vector<Genotype> newPopulation;
+    newPopulation.push_back(intermediatePop[0]);
+    newPopulation.push_back(intermediatePop[1]);
     while(newPopulation.size() < newPopSize)
     {
-        vector<Genotype> offspringOneAndTwo = completeCrossover(intermediatePop[0], intermediatePop[1], defaultCrossSwapProb);
+        int rand1 = rand() % newPopSize;
+        int rand2 = 0;
+        do
+        {
+            rand2 = rand() % newPopSize;
+        } while (rand1 == rand2);
+        
+        vector<Genotype> offspringOneAndTwo = completeCrossover(intermediatePop[rand1], intermediatePop[rand2], defaultCrossSwapProb);
         newPopulation.push_back(offspringOneAndTwo[0]);
         if(newPopulation.size() < newPopSize)
         {
@@ -104,11 +180,11 @@ vector<Genotype> GeneticAlgorithm::recombination(vector<Genotype> intermediatePo
 }
 void GeneticAlgorithm::mutation(vector<Genotype> newPop)
 {
-    for(Genotype geno : newPop)
+    for(int i = 2; i < newPop.size(); i++)
     {
         if(((double) rand() / (RAND_MAX)) < defaultMutationPerc)
         {
-            mutateGenotype(geno, defaultMutationProb, defaultMutationAmount);
+            mutateGenotype(newPop[i], defaultMutationProb, defaultMutationAmount);
         }
     }
 }
