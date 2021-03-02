@@ -11,122 +11,109 @@ void Genotype::setRandomParams(float minVal, float maxVal)
     for(int i = 0; i < params.size(); i++)
     {
         params[i] = (((double) rand() / (RAND_MAX)) *range + minVal);
+        cout << params[i] << endl;
     }
 }
 //----------------------------------------------------------------------------------------------------------------------------------
-Agent::Agent(Genotype genotype, vector<float> topology, VehicleState state)
-{
-    vehicleState = state;
-    nn = NeuralNet(topology);
-    vehicleStatus = Vehicle(10, 16.5);
-}
-void Agent::update()
-{
-    vector<double> sensorInfo = vehicleStatus.getDistanceFromObstacles();
-    nn.feedForward(sensorInfo);
-    vector<double> results;
-    nn.getResults(results);
-    processNNResults(results); //set new location for neural network
-    nonHolonomicRelaxedCostMap() //current position, start position, get PercDone, add eval to geno
-}
-void Agent::processNNresults(vector<double> nnResults)
-{
-    Steer steer = Straight;
-    if(nnResults[0] < .33)
-    {
-        steer = Left;
-    }
-    else if(nnResults[0 < .66])
-    {
-        steer = Right;
-    }
-    Gear gear = ( nnResults[1] > .5f) ? Forward : Backward;
-    state = vehicleStatus.getNextState(state, steer, gear, nnResults[2]);
-}
+// Agent::Agent(Genotype genotype, vector<float> topology, VehicleState state)
+// {
+//     // vehicleState = state;
+//     // nn = NeuralNet(topology);
+//     // vehicleStatus = Vehicle(10, 16.5);
+// }
+// void Agent::update()
+// {
+//     // vector<double> sensorInfo = vehicleStatus.getDistanceFromObstacles();
+//     // nn.feedForward(sensorInfo);
+//     // vector<double> results;
+//     // nn.getResults(results);
+//     // vehicleState = nn.processResults(&vehicleStatus, vehicleState, results);
+//     //nonHolonomicRelaxedCostMap() //current position, start position, get PercDone, add eval to geno
+//      check if crashed
+// }
 //----------------------------------------------------------------------------------------------------------------------------------
-GeneticAlgorithm::GeneticAlgorithm(int genotypeParamCount, int populationSize)
+GeneticAlgorithm::GeneticAlgorithm(int genotypeParamCount, int populationSize, const vector<unsigned> &topology)
 {
     this->populationSize = populationSize;
-    vector<Genotype> currentPopulation;
-    currentPopulation.resize(populationSize,Genotype(vector<float>(genotypeParamCount, 0)));
+    this->topology = topology;
+    currentPopulation.resize(populationSize, Genotype(vector<float>(genotypeParamCount, 0)));
     GenerationCount = 1;
     sortPopulation = true;
-    running = false;
 }
-void GeneticAlgorithm::start()
+void GeneticAlgorithm::start(const int trainAmount)
 {
-    running = true;
-    initPopulation(currentPopulation);
-    evaluation(currentPopulation);
+    this->trainAmount = trainAmount;
+    initPopulation();
+    //mapGenerator m = mapGenerator(50, 50, vector<int>{3,3},7,numVehicles);
+    evaluation();
 }
 
-void GeneticAlgorithm::initPopulation(vector<Genotype> currentPop)
+void GeneticAlgorithm::initPopulation()
 {
-    for(Genotype geo : currentPop)
+    for(Genotype &geo : currentPopulation)
     {
         geo.setRandomParams(defaultInitParamMin, defaultInitParamMax);
     }
 }
-void GeneticAlgorithm::evaluation(vector<Genotype> currentPop)
+void GeneticAlgorithm::evaluation()
 {
     agents.clear();
-    //refresh grid/start points
-    vector<float> topology = {24, 12, 12, 6,  3};
-    for(Genotype geno : currentPopulation)
-    {
-        agents.push_back(Agent(geno, topology));
-    }
+    // //refresh grid/start points
+    //NEED WALDO
+    // for(Genotype geno : currentPopulation)
+    // {
+    //     agents.push_back(Agent(geno, topology));
+    // }
     int vehiclesCrashed = 0;
     while(vehiclesCrashed < currentPopulation.size())
     {
-        for(Agent agent : agents)
+        for(Agent &agent : agents)
         {
             if(agent.hasCrashed)
             {
                 continue;
             }
-            agent.update();
+            //agent.update();
         }
     }
     evaluationFinished();
 }
 void GeneticAlgorithm::evaluationFinished()
 {
-    fitnessCalculation(currentPopulation);
+    fitnessCalculation();
     if(sortPopulation)
     {
 
     }
-    if(false)
+    if(GenerationCount < trainAmount)
     {
-        //quit
+        vector<Genotype> intermediatePop = selection();
+        vector<Genotype> newPopulation = recombination(intermediatePop, populationSize);
+        mutation(newPopulation);
+        currentPopulation = newPopulation;
+        GenerationCount++;
+        evaluation();
     }
-    vector<Genotype> intermediatePop = selection(currentPopulation);
-    vector<Genotype> newPopulation = recombination(intermediatePop, populationSize);
-    mutation(newPopulation);
-    currentPopulation = newPopulation;
-    GenerationCount++;
-    evaluation(currentPopulation);
 }
-void GeneticAlgorithm::fitnessCalculation(vector<Genotype> currentPop)
+void GeneticAlgorithm::fitnessCalculation()
 {
     int populationSize = 0;
     float overallEval = 0;
-    for(Genotype geno : currentPop)
+    for(Genotype &geno : currentPopulation)
     {
         overallEval += geno.eval;
         populationSize++;
     }
     float averageEval = overallEval / populationSize;
-    for(Genotype geno : currentPop)
+    for(Genotype &geno : currentPopulation)
     {
         geno.fitness = overallEval / populationSize;
     }
 }
-vector<Genotype> GeneticAlgorithm::selection(vector<Genotype> currentPop)
+vector<Genotype> GeneticAlgorithm::selection()
 {
     vector<Genotype> intermediatePopulation;
-    for(Genotype geno : currentPop)
+    for(Genotype &geno : currentPopulation)
     {
         if(geno.fitness < 1)
         {
@@ -140,7 +127,7 @@ vector<Genotype> GeneticAlgorithm::selection(vector<Genotype> currentPop)
             }
         }
     }
-    for(Genotype geno : currentPop)
+    for(Genotype &geno : currentPopulation)
     {
         float remainder = geno.fitness - (int)geno.fitness;
         if(((double) rand() / (RAND_MAX)) < remainder)
@@ -178,7 +165,7 @@ vector<Genotype> GeneticAlgorithm::recombination(vector<Genotype> intermediatePo
     }
     return newPopulation;
 }
-void GeneticAlgorithm::mutation(vector<Genotype> newPop)
+void GeneticAlgorithm::mutation(vector<Genotype> &newPop)
 {
     for(int i = 2; i < newPop.size(); i++)
     {
@@ -188,7 +175,7 @@ void GeneticAlgorithm::mutation(vector<Genotype> newPop)
         }
     }
 }
-vector<Genotype> GeneticAlgorithm::completeCrossover(Genotype parent1, Genotype parent2, float swapChance)
+vector<Genotype> GeneticAlgorithm::completeCrossover(const Genotype &parent1, const Genotype &parent2, float swapChance)
 {
     int paramCount = parent1.params.size();
     vector<float> off1Params(paramCount);
@@ -208,7 +195,7 @@ vector<Genotype> GeneticAlgorithm::completeCrossover(Genotype parent1, Genotype 
     }
     return vector<Genotype>{Genotype(off1Params), Genotype(off2Params)};
 }
-void GeneticAlgorithm::mutateGenotype(Genotype genotype, float mutationProb, float mutationAmount)
+void GeneticAlgorithm::mutateGenotype(Genotype &genotype, float mutationProb, float mutationAmount)
 {
     for(float param : genotype.params)
     {
@@ -216,5 +203,20 @@ void GeneticAlgorithm::mutateGenotype(Genotype genotype, float mutationProb, flo
         {
             param += float(((double) rand() / (RAND_MAX)) * mutationAmount* 2 - mutationAmount);
         }
+    }
+}
+vector<Genotype> GeneticAlgorithm::getPopulation()
+{
+    return currentPopulation;
+}
+void GeneticAlgorithm::printPopulation()
+{
+    for(Genotype &geo : currentPopulation)
+    {
+        for(float param : geo.params)
+        {
+            cout << param << " ";
+        }
+        cout << endl;
     }
 }

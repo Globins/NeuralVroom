@@ -66,22 +66,33 @@ void NeuralNet::getResults(vector<double> &resultVals) const{
 
 
 }
-
+VehicleState NeuralNet::processResults(Vehicle* vehicle, VehicleState state, const vector<double> &resultVals)
+{
+    Steer steer = Straight;
+    if(resultVals[0] < .33)
+    {
+        steer = Left;
+    }
+    else if(resultVals[0 < .66])
+    {
+        steer = Right;
+    }
+    Gear gear = ( resultVals[1] > .5f) ? Forward : Backward;
+    return vehicle->getNextState(state, steer, gear, resultVals[2]);
+}
 vector<VehicleState> NeuralNet::run(Grid* grid, Vehicle* vehicle, VehicleState startPos, VehicleState endPos)
 {
     vector<VehicleState> path;
     VehicleState currentPos = startPos; 
     path.push_back(currentPos);
-
+    vector<vector<int>> m = grid->returnRawMap();
     while(grid->isSafe(currentPos, 1.5) || areEquivalentStates(currentPos, endPos))
     {
-        vector<double> inputs = vehicle->getDistanceFromObstacles(grid->returnRawMap(), currentPos); // get raw grid map
+        vector<double> inputs = vehicle->getDistanceFromObstacles(m, currentPos);
         feedForward(inputs);
         vector<double> results;
         getResults(results);
-        //steer and gear here
-        //currentPos = vehicle->current_path(currentPos, results[0], results[1], results[2]);
-        path.push_back(currentPos);
+        path.push_back(processResults(vehicle, currentPos, results));
     }
     return path;
 }

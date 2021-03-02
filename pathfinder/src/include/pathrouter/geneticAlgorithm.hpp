@@ -1,4 +1,6 @@
 #include "../utils.hpp"
+#include "../grid.hpp"
+#include "../mapGenerator.hpp"
 #include "../vehicle.hpp"
 #include "../pathrouter/neuralnetwork.hpp"
 class Genotype
@@ -28,8 +30,8 @@ struct Agent
 public:
     Agent(Genotype genotype, vector<float> topology, VehicleState state);
     void update();
-    void processNNresults(vector<double> nnResults);
-    Vehicle vehicleStatus;
+
+    //Vehicle vehicleStatus;
     VehicleState vehicleState;
     NeuralNet nn;
     bool hasCrashed = false;
@@ -38,19 +40,23 @@ public:
 class GeneticAlgorithm
 {
     public:
-        GeneticAlgorithm(int genotypeParamCount, int populationSize);
-        void start();
-        void initPopulation(vector<Genotype> currentPop);
-        void evaluation(vector<Genotype> currentPop);
-        void evaluationFinished();
-        void fitnessCalculation(vector<Genotype> currentPop);
-        vector<Genotype> selection(vector<Genotype> currentPop);
-        vector<Genotype> recombination(vector<Genotype> intermediatePop, int newPopSize);
-        void mutation(vector<Genotype> newPop);
-        vector<Genotype> completeCrossover(Genotype parent1, Genotype parent2, float swapChance);
-        void mutateGenotype(Genotype genotype, float mutationProb, float mutationAmount);
+        GeneticAlgorithm(int genotypeParamCount, int populationSize, const vector<unsigned> &topology);
+        void start(const int trainAmount);
+        void evaluation();
+        vector<Genotype> getPopulation();
+        NeuralNet GenotypeParamsToNeuralNet(vector<Genotype> currentPop);
+        void printPopulation();
         
     private:
+        void initPopulation();
+        void evaluationFinished();
+        void fitnessCalculation();
+        vector<Genotype> selection();
+        vector<Genotype> recombination(vector<Genotype> intermediatePop, int newPopSize);
+        void mutation(vector<Genotype> &newPop);
+        vector<Genotype> completeCrossover(const Genotype &parent1, const Genotype &parent2, float swapChance);
+        void mutateGenotype(Genotype &genotype, float mutationProb, float mutationAmount);
+
         float defaultInitParamMin = -1;
         float defaultInitParamMax = 1;
         float defaultCrossSwapProb = .6;
@@ -59,13 +65,11 @@ class GeneticAlgorithm
         float defaultMutationPerc = 1;
         
         vector<Agent> agents;
-
+        vector<unsigned> topology;
         vector<Genotype> currentPopulation;
         int populationSize;
         int GenerationCount;
+        int trainAmount;
         bool sortPopulation;
-        bool running;
-
-
 };
 
