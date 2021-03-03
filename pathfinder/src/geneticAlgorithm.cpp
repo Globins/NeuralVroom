@@ -23,13 +23,7 @@ Agent::Agent(Genotype genotype, vector<unsigned> topology, VehicleState state, v
 }
 void Agent::update(vector<vector<int>> m)
 {
-    cout << "hi" << endl;
     vector<double> sensorInfo = vehicleStatus.getDistanceFromObstacles(m, vehicleState);
-    for(double info : sensorInfo)
-    {
-        cout << info << " ";
-    }
-    cout << endl;
     nn.feedForward(sensorInfo);
     vector<double> results;
     nn.getResults(results);
@@ -69,13 +63,13 @@ void GeneticAlgorithm::evaluation()
     
     for(int i = 0; i < currentPopulation.size(); i++)
     {
-        VehicleState state = VehicleState{start[i][0], start[i][1], start[i][2], Forward, Straight};
-        vector<vector<float>> costMap = grid->nonHolonomicRelaxedCostMap(VehicleState{end[i][0], end[i][1], end[i][2], Forward, Straight});
+        VehicleState state = VehicleState{start[i][0], start[i][1], deg2rad(start[i][2]), Forward, Straight};
+        vector<vector<float>> costMap = grid->nonHolonomicRelaxedCostMap(VehicleState{end[i][0], end[i][1], deg2rad(end[i][2]), Forward, Straight});
         agents.push_back(Agent(currentPopulation[i], topology, state, costMap));
     }
     int vehiclesCrashed = 0;
-    //while(vehiclesCrashed < currentPopulation.size())
-    //{
+    while(vehiclesCrashed < currentPopulation.size())
+    {
         for(int i = 0; i < agents.size(); i++)
         {
             if(agents[i].hasCrashed)
@@ -86,6 +80,7 @@ void GeneticAlgorithm::evaluation()
             else if(!grid->isSafe(agents[i].vehicleState, 1.5))
             {
                 agents[i].hasCrashed = true;
+                vehiclesCrashed++;
                 cout << "AGENT " << i << ": CRASHED" << endl;
                 continue;
             }
@@ -96,8 +91,8 @@ void GeneticAlgorithm::evaluation()
             cout << "AGENT " << i << ": " << agents[i].vehicleState.posX << ", " << agents[i].vehicleState.posY << ", " << currentPopulation[i].eval << endl;
         }
         cout << endl;
-    //}
-    evaluationFinished();
+    }
+    //evaluationFinished();
 }
 void GeneticAlgorithm::evaluationFinished()
 {

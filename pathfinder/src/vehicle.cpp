@@ -33,7 +33,6 @@ VehicleState Vehicle::getNextState(VehicleState current, Steer steer, Gear gear,
         xPos *= -1;
         angle *= -1;
     }
-
     Coordinates2D correctedPos = rotate(xPos, yPos, current.ori);
     current.posX += correctedPos.x;
     current.posY += correctedPos.y;
@@ -74,7 +73,6 @@ vector<Coordinates3D> Vehicle::getSurroundingCoords(Coordinates3D currentPos, fl
         if (currentOrientation >= 2*M_PI)
             currentOrientation -= 2*M_PI;
     }
-    cout << "COORDS SIZE: " << surroundingCoords.size() << endl;
     return surroundingCoords;
 }
 
@@ -126,5 +124,3 @@ vector<double> Vehicle::getDistanceFromObstacles(vector<vector<int>> m, VehicleS
     }
     return distances;
 }
-
-//vector<double> inputs = getInputs(m.getMap(), vehicleIDMap[id], startPoints[id], endPoints[id]);

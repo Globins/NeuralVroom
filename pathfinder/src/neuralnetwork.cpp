@@ -103,6 +103,10 @@ VehicleState NeuralNet::processResults(Vehicle* vehicle, VehicleState state, con
         steer = Right;
     }
     Gear gear = ( resultVals[1] > .5f) ? Forward : Backward;
+    VehicleState nextMove = vehicle->getNextState(state, steer, gear, resultVals[2]);
+    cout << "STEER" << resultVals[0] << endl;
+    cout << "GEAR" << resultVals[1] << endl;
+    cout << "TIME" << resultVals[2] << endl;
     return vehicle->getNextState(state, steer, gear, resultVals[2]);
 }
 vector<VehicleState> NeuralNet::run(Grid* grid, Vehicle* vehicle, VehicleState startPos, VehicleState endPos)
