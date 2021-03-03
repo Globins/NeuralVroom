@@ -74,7 +74,7 @@ vector<Coordinates3D> Vehicle::getSurroundingCoords(Coordinates3D currentPos, fl
         if (currentOrientation >= 2*M_PI)
             currentOrientation -= 2*M_PI;
     }
-    cout << "hi" << endl;
+    cout << "COORDS SIZE: " << surroundingCoords.size() << endl;
     return surroundingCoords;
 }
 
