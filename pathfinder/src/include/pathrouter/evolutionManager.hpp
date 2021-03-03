@@ -2,7 +2,7 @@
 class EvolutionManager
 {
 public:
-    NeuralNet train(const vector<unsigned> &topology, const int trainAmount, const bool saveData);
+    NeuralNet train(const vector<unsigned> &topology, const int trainAmount, const bool saveData, mapGenerator &m);
     void startEvolution();
 private:
     void writeResultsToFile(vector<Genotype> currentPop);

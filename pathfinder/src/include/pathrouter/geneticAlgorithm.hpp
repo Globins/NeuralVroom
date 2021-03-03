@@ -29,7 +29,7 @@ struct Agent
 {
 public:
     Agent(Genotype genotype, vector<unsigned> topology, VehicleState state);
-    void update();
+    void update(vector<vector<int>> m);
 
     Vehicle vehicleStatus = Vehicle(10, 16.5);
     VehicleState vehicleState;
@@ -40,7 +40,7 @@ public:
 class GeneticAlgorithm
 {
     public:
-        GeneticAlgorithm(int genotypeParamCount, int populationSize, const vector<unsigned> &topology);
+        GeneticAlgorithm(int genotypeParamCount, int populationSize, const vector<unsigned> &topology, mapGenerator &m);
         void start(const int trainAmount);
         void evaluation();
         vector<Genotype> getPopulation();
@@ -63,6 +63,7 @@ class GeneticAlgorithm
         float defaultMutationAmount = 2;
         float defaultMutationPerc = 1;
         
+        mapGenerator* mapGenPtr;
         vector<Agent> agents;
         vector<unsigned> topology;
         vector<Genotype> currentPopulation;

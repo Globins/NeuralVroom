@@ -20,21 +20,20 @@ Agent::Agent(Genotype genotype, vector<unsigned> topology, VehicleState state)
     nn = NeuralNet(topology);
     nn.GenotypeParamsToWeights(genotype.params);
 }
-void Agent::update()
+void Agent::update(vector<vector<int>> m)
 {
-    // vector<double> sensorInfo = vehicleStatus.getDistanceFromObstacles();
-    // nn.feedForward(sensorInfo);
+    vector<double> sensorInfo = vehicleStatus.getDistanceFromObstacles(m, vehicleState);
+    nn.feedForward(sensorInfo);
     vector<double> results;
     nn.getResults(results);
     vehicleState = nn.processResults(&vehicleStatus, vehicleState, results);
-    //nonHolonomicRelaxedCostMap() //current position, start position, get PercDone, add eval to geno
-     //check if crashed
 }
 //----------------------------------------------------------------------------------------------------------------------------------
-GeneticAlgorithm::GeneticAlgorithm(int genotypeParamCount, int populationSize, const vector<unsigned> &topology)
+GeneticAlgorithm::GeneticAlgorithm(int genotypeParamCount, int populationSize, const vector<unsigned> &topology, mapGenerator &m)
 {
     this->populationSize = populationSize;
     this->topology = topology;
+    this->mapGenPtr = &m;
     currentPopulation.resize(populationSize, Genotype(vector<float>(genotypeParamCount, 0)));
     GenerationCount = 1;
     sortPopulation = true;
@@ -43,7 +42,6 @@ void GeneticAlgorithm::start(const int trainAmount)
 {
     this->trainAmount = trainAmount;
     initPopulation();
-    //mapGenerator m = mapGenerator(50, 50, vector<int>{3,3},7,numVehicles);
     evaluation();
 }
 
@@ -58,26 +56,35 @@ void GeneticAlgorithm::initPopulation()
 void GeneticAlgorithm::evaluation()
 {
     agents.clear();
-    // //refresh grid/start points
-    //NEED WALDO
-    for(Genotype geno : currentPopulation)
+    vector<vector<float>> start = mapGenPtr->getStartPoints();
+    vector<vector<float>> end = mapGenPtr->getEndPoints();
+    Grid *grid = mapGenPtr->getGrid();
+    for(int i = 0; i < currentPopulation.size(); i++)
     {
-        //agents.push_back(Agent(geno, topology));
+        VehicleState state = VehicleState{start[i][0], start[i][1], start[i][2], Forward, Straight};
+        agents.push_back(Agent(currentPopulation[i], topology, state));
     }
+
     int vehiclesCrashed = 0;
     while(vehiclesCrashed < currentPopulation.size())
     {
-        for(Agent &agent : agents)
+        for(int i = 0; i < agents.size(); i++)
         {
-            //check their locations, flag hasCrashed if any true
-            if(agent.hasCrashed)
+            vector<vector<float>> costMap = grid->nonHolonomicRelaxedCostMap({end[i][0], end[i][1], end[i][2], Forward, Straight});
+            //check for collisions
+            if(!grid->isSafe(agents[i].vehicleState, 1.5))
+            {
+                agents[i].hasCrashed = true;
+            }
+            if(agents[i].hasCrashed)
             {
                 continue;
             }
-            agent.update();
+            agents[i].update(mapGenPtr->getMap());
+            currentPopulation[i].eval = costMap[agents[i].vehicleState.posX][agents[i].vehicleState.posY] / costMap[end[i][0]][end[i][1]];
         }
     }
-    evaluationFinished();
+    //evaluationFinished();
 }
 void GeneticAlgorithm::evaluationFinished()
 {
