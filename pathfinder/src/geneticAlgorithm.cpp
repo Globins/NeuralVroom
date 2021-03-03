@@ -54,6 +54,7 @@ void GeneticAlgorithm::initPopulation()
         geo.setRandomParams(defaultInitParamMin, defaultInitParamMax);
     }
 }
+
 void GeneticAlgorithm::evaluation()
 {
     agents.clear();

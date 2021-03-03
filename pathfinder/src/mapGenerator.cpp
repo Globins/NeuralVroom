@@ -94,6 +94,8 @@ void mapGenerator::setStreetsIntersections(set<vector<int>> freeSpaceX,set<vecto
 
 void mapGenerator::setStartEndPoints()
 {
+    this->startPoints.clear();
+    this->endPoints.clear();
     srand (time(NULL));
     for(int i = 0; i < vehicleNum; i++){
         vector<float> s;
