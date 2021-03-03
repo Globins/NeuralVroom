@@ -92,7 +92,6 @@ void GeneticAlgorithm::evaluation()
             agents[i].update(mapGenPtr->getMap());
             float startDist = agents[i].costMap[start[i][0]][start[i][1]];
             float currentDist = agents[i].costMap[agents[i].vehicleState.posX][agents[i].vehicleState.posY];
-            cout << startDist << " " << currentDist << endl;
             currentPopulation[i].eval = (startDist - currentDist) / startDist;
             cout << "AGENT " << i << ": " << agents[i].vehicleState.posX << ", " << agents[i].vehicleState.posY << ", " << currentPopulation[i].eval << endl;
         }
