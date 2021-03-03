@@ -47,7 +47,7 @@ NeuralNet::NeuralNet(const vector<unsigned> &topology)
         {
             m_layers.back().push_back(Neuron(numOutputs, neuronNum));
         }
-        weightCount += layerNum == topology.size()-1 ? 0 : (topology[layerNum]+1)*numOutputs;
+        weightCount += layerNum == topology.size()-1 ? 0 : (topology[layerNum])*numOutputs;
     }
 }
 void NeuralNet::feedForward(const vector<double> &inputVals)
@@ -75,13 +75,12 @@ void NeuralNet::getResults(vector<double> &resultVals) const{
 void NeuralNet::GenotypeParamsToWeights(const vector<float> &population)
 {
     int index = 0;
-    for(unsigned layerNum = 0; layerNum < m_layers.size(); layerNum++)
+    for(unsigned layerNum = 0; layerNum < m_layers.size()-1; layerNum++)
     {
-        unsigned numOutputs = layerNum == m_layers.size()-1 ? 0 : m_layers[layerNum+1].size();
-        for(unsigned neuronNum = 0; neuronNum <= m_layers[layerNum].size(); neuronNum++)
+        for(unsigned neuronNum = 0; neuronNum < m_layers[layerNum].size()-1; neuronNum++)
         {
             vector<double> newWeights;
-            for(int i = 0; i < numOutputs; i++)
+            for(int i = 0; i < m_layers[layerNum+1].size()-1; i++)
             {
                 newWeights.push_back(population[index]);
                 index++;

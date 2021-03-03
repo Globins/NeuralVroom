@@ -28,9 +28,9 @@ struct GENOcomparator
 struct Agent
 {
 public:
-    Agent(Genotype genotype, vector<unsigned> topology, VehicleState state);
+    Agent(Genotype genotype, vector<unsigned> topology, VehicleState state, vector<vector<float>> costMap);
     void update(vector<vector<int>> m);
-
+    vector<vector<float>> costMap;
     Vehicle vehicleStatus = Vehicle(10, 16.5);
     VehicleState vehicleState;
     NeuralNet nn = NeuralNet({1});

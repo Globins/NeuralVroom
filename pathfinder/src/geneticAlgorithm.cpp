@@ -14,15 +14,22 @@ void Genotype::setRandomParams(float minVal, float maxVal)
     }
 }
 //----------------------------------------------------------------------------------------------------------------------------------
-Agent::Agent(Genotype genotype, vector<unsigned> topology, VehicleState state)
+Agent::Agent(Genotype genotype, vector<unsigned> topology, VehicleState state, vector<vector<float>> costMap)
 {
     vehicleState = state;
     nn = NeuralNet(topology);
     nn.GenotypeParamsToWeights(genotype.params);
+    this->costMap = costMap;
 }
 void Agent::update(vector<vector<int>> m)
 {
+    cout << "hi" << endl;
     vector<double> sensorInfo = vehicleStatus.getDistanceFromObstacles(m, vehicleState);
+    for(double info : sensorInfo)
+    {
+        cout << info << " ";
+    }
+    cout << endl;
     nn.feedForward(sensorInfo);
     vector<double> results;
     nn.getResults(results);
@@ -59,32 +66,39 @@ void GeneticAlgorithm::evaluation()
     vector<vector<float>> start = mapGenPtr->getStartPoints();
     vector<vector<float>> end = mapGenPtr->getEndPoints();
     Grid *grid = mapGenPtr->getGrid();
+    
     for(int i = 0; i < currentPopulation.size(); i++)
     {
         VehicleState state = VehicleState{start[i][0], start[i][1], start[i][2], Forward, Straight};
-        agents.push_back(Agent(currentPopulation[i], topology, state));
+        vector<vector<float>> costMap = grid->nonHolonomicRelaxedCostMap(VehicleState{end[i][0], end[i][1], end[i][2], Forward, Straight});
+        agents.push_back(Agent(currentPopulation[i], topology, state, costMap));
     }
-
     int vehiclesCrashed = 0;
-    while(vehiclesCrashed < currentPopulation.size())
-    {
+    //while(vehiclesCrashed < currentPopulation.size())
+    //{
         for(int i = 0; i < agents.size(); i++)
         {
-            vector<vector<float>> costMap = grid->nonHolonomicRelaxedCostMap({end[i][0], end[i][1], end[i][2], Forward, Straight});
-            //check for collisions
-            if(!grid->isSafe(agents[i].vehicleState, 1.5))
-            {
-                agents[i].hasCrashed = true;
-            }
             if(agents[i].hasCrashed)
             {
+                cout << "AGENT " << i << ": CRASHED" << endl;
+                continue;
+            }
+            else if(!grid->isSafe(agents[i].vehicleState, 1.5))
+            {
+                agents[i].hasCrashed = true;
+                cout << "AGENT " << i << ": CRASHED" << endl;
                 continue;
             }
             agents[i].update(mapGenPtr->getMap());
-            currentPopulation[i].eval = costMap[agents[i].vehicleState.posX][agents[i].vehicleState.posY] / costMap[end[i][0]][end[i][1]];
+            float startDist = agents[i].costMap[start[i][0]][start[i][1]];
+            float currentDist = agents[i].costMap[agents[i].vehicleState.posX][agents[i].vehicleState.posY];
+            cout << startDist << " " << currentDist << endl;
+            currentPopulation[i].eval = (startDist - currentDist) / startDist;
+            cout << "AGENT " << i << ": " << agents[i].vehicleState.posX << ", " << agents[i].vehicleState.posY << ", " << currentPopulation[i].eval << endl;
         }
-    }
-    //evaluationFinished();
+        cout << endl;
+    //}
+    evaluationFinished();
 }
 void GeneticAlgorithm::evaluationFinished()
 {
@@ -93,15 +107,15 @@ void GeneticAlgorithm::evaluationFinished()
     {
 
     }
-    if(GenerationCount < trainAmount)
-    {
-        vector<Genotype> intermediatePop = selection();
-        vector<Genotype> newPopulation = recombination(intermediatePop, populationSize);
-        mutation(newPopulation);
-        currentPopulation = newPopulation;
-        GenerationCount++;
-        evaluation();
-    }
+    // if(GenerationCount < trainAmount)
+    // {
+    //     vector<Genotype> intermediatePop = selection();
+    //     vector<Genotype> newPopulation = recombination(intermediatePop, populationSize);
+    //     mutation(newPopulation);
+    //     currentPopulation = newPopulation;
+    //     GenerationCount++;
+    //     evaluation();
+    // }
 }
 void GeneticAlgorithm::fitnessCalculation()
 {
