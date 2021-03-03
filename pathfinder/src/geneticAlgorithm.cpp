@@ -14,29 +14,28 @@ void Genotype::setRandomParams(float minVal, float maxVal)
     }
 }
 //----------------------------------------------------------------------------------------------------------------------------------
-// Agent::Agent(Genotype genotype, vector<float> topology, VehicleState state)
-// {
-//     // vehicleState = state;
-//     // nn = NeuralNet(topology);
-//     // vehicleStatus = Vehicle(10, 16.5);
-// }
-// void Agent::update()
-// {
-//     // vector<double> sensorInfo = vehicleStatus.getDistanceFromObstacles();
-//     // nn.feedForward(sensorInfo);
-//     // vector<double> results;
-//     // nn.getResults(results);
-//     // vehicleState = nn.processResults(&vehicleStatus, vehicleState, results);
-//     //nonHolonomicRelaxedCostMap() //current position, start position, get PercDone, add eval to geno
-//      check if crashed
-// }
+Agent::Agent(Genotype genotype, vector<unsigned> topology, VehicleState state)
+{
+    vehicleState = state;
+    nn = NeuralNet(topology);
+    nn.GenotypeParamsToWeights(genotype.params);
+}
+void Agent::update()
+{
+    // vector<double> sensorInfo = vehicleStatus.getDistanceFromObstacles();
+    // nn.feedForward(sensorInfo);
+    vector<double> results;
+    nn.getResults(results);
+    vehicleState = nn.processResults(&vehicleStatus, vehicleState, results);
+    //nonHolonomicRelaxedCostMap() //current position, start position, get PercDone, add eval to geno
+     //check if crashed
+}
 //----------------------------------------------------------------------------------------------------------------------------------
 GeneticAlgorithm::GeneticAlgorithm(int genotypeParamCount, int populationSize, const vector<unsigned> &topology)
 {
     this->populationSize = populationSize;
     this->topology = topology;
     currentPopulation.resize(populationSize, Genotype(vector<float>(genotypeParamCount, 0)));
-    cout << genotypeParamCount << endl;
     GenerationCount = 1;
     sortPopulation = true;
 }
@@ -60,20 +59,21 @@ void GeneticAlgorithm::evaluation()
     agents.clear();
     // //refresh grid/start points
     //NEED WALDO
-    // for(Genotype geno : currentPopulation)
-    // {
-    //     agents.push_back(Agent(geno, topology));
-    // }
+    for(Genotype geno : currentPopulation)
+    {
+        //agents.push_back(Agent(geno, topology));
+    }
     int vehiclesCrashed = 0;
     while(vehiclesCrashed < currentPopulation.size())
     {
         for(Agent &agent : agents)
         {
+            //check their locations, flag hasCrashed if any true
             if(agent.hasCrashed)
             {
                 continue;
             }
-            //agent.update();
+            agent.update();
         }
     }
     evaluationFinished();
