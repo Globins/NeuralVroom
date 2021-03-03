@@ -2,6 +2,7 @@
 #define MAPGENERATOR_H
 
 #include "utils.hpp"
+#include "grid.hpp"
 #include <time.h> 
 #include <map>
 
@@ -14,7 +15,6 @@ private:
     vector<vector<float>> endPoints;
     vector<int> blocks;
     vector<int> blockDimensions;
-    set<vector<int>> obstacles;
     set<vector<vector<int>>> streets;
     set<vector<vector<int>>> intersections;
     vector<vector<int>> mp;
@@ -25,6 +25,8 @@ private:
     int rows;
     int cols;
 
+    Grid *grid;
+
     void generateMap();
     void setObsRanges();
     void setObsCoordinates(vector<vector<int>> xRanges,  vector<vector<int>> yRanges);
@@ -32,15 +34,15 @@ private:
     void setStartEndPoints();
 public:
 
-    mapGenerator(int rows, int cols, vector<int> blocks, int spacer,int vehicleNum);
+    mapGenerator(int rows, int cols, vector<int> blocks, int spacer, int vehicleNum);
     friend std::ostream& operator<<(std::ostream &out, const mapGenerator &m);
     vector<vector<float>> getStartPoints();
     vector<vector<float>> getEndPoints();
-    set<vector<int>> getObstacles();
+    Grid* getGrid();
     set<vector<vector<int>>> getStreets();
     set<vector<vector<int>>> getIntersections();
     vector<vector<int>> getMap(){ return this->mp; };
-    ~mapGenerator() = default;
+    ~mapGenerator(){delete this->grid;};
     
     
 };

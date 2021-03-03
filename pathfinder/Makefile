@@ -5,7 +5,7 @@
 # Compiler settings - Can be customized.
 CC = g++
 CXXFLAGS = -std=c++11 -Wall
-LDFLAGS = 
+LDFLAGS = -lws2_32
 
 # Makefile settings - Can be customized.
 APPNAME = PathFinder

@@ -8,6 +8,7 @@ mapGenerator::mapGenerator(int rows, int cols, vector<int> blocks, int spacer, i
     this->spacer = spacer;
     this->vehicleNum = vehicleNum;
     this->mp = vector<vector<int>>(rows+1, vector<int> (cols+1,0))  ;
+    this->grid = new Grid(cols+5, rows+5);
     generateMap();
 }
 
@@ -19,9 +20,9 @@ void mapGenerator::generateMap()
     this->blockDimensions.push_back(col_space/this->blocks[1]);
     
     setObsRanges();
-    for(vector<int> obs : this->obstacles){
-        this->mp[obs[0]][obs[1]] = 1;
-    }
+    // for(vector<int> obs : this->obstacles){
+    //     this->mp[obs[0]][obs[1]] = 1;
+    // }
 }
 
 void mapGenerator::setObsRanges()
@@ -52,12 +53,12 @@ void mapGenerator::setObsCoordinates(vector<vector<int>> xRanges,  vector<vector
         for(vector<int> yRange: yRanges){
             freeSpaceY.insert(vector<int>{yRange[1]+1, yRange[1]+this->spacer-1});
             for(int x = xRange[0]; x < xRange[1]+1; x++){
-                this->obstacles.insert(vector<int>{x,yRange[0]});
-                this->obstacles.insert(vector<int>{x,yRange[1]});
+                this->grid->addObstacle(x,yRange[0]);
+                this->grid->addObstacle(x,yRange[1]);
             }
             for(int y = yRange[0]; y < yRange[1]+1; y++){
-                this->obstacles.insert(vector<int>{xRange[0],y});
-                this->obstacles.insert(vector<int>{xRange[1],y});
+                this->grid->addObstacle(xRange[0],y);
+                this->grid->addObstacle(xRange[1],y);
             }
         }
     }
@@ -127,8 +128,8 @@ vector<vector<float>> mapGenerator::getStartPoints(){
 vector<vector<float>> mapGenerator::getEndPoints(){
     return this->endPoints;
 }
-set<vector<int>> mapGenerator::getObstacles(){
-    return this->obstacles;
+Grid* mapGenerator::getGrid(){
+    return this->grid;
 }
 set<vector<vector<int>>> mapGenerator::getStreets(){
     return this->streets;
@@ -149,11 +150,6 @@ std::ostream& operator<<(std::ostream &out, const mapGenerator &m){
     }
     out << "\n";
     out << "Block Dimensions: " << m.blockDimensions[0] << " " << m.blockDimensions[1] << "\n";
-    out << "obs coordinates: \n";
-    for(vector<int> obstacle: m.obstacles){
-        out << "(" << obstacle[0] << "," << obstacle[1] << "),";
-    }
-    out << "\n";
     out << "Streets: " << m.streets.size() << "\n";
     for(vector<vector<int>> street : m.streets){
         for(int x = street[0][0]; x < street[0][1]+1; x++){
