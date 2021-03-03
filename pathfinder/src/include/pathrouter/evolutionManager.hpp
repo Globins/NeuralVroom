@@ -1,17 +1,14 @@
-// #include "neuralnetwork.hpp"
-// #include "geneticAlgorithm.hpp"
-// #include "../grid.hpp"
-// class EvolutionManager
-// {
-// public:
-//     NeuralNet train(const vector<unsigned> &topology, Grid* Grid, bool saveData);
-//     void startEvolution();
-// private:
-//     void writeResultsToFile();
-//     void checkIfAgentReachedDest();
-//     void restartEvolution();
+#include "geneticAlgorithm.hpp"
+class EvolutionManager
+{
+public:
+    NeuralNet train(const vector<unsigned> &topology, const int trainAmount, const bool saveData);
+    void startEvolution();
+private:
+    void writeResultsToFile(vector<Genotype> currentPop);
+    void restart(GeneticAlgorithm ga);
 
-//     vector<unsigned> topology;
-//     int genotypesSaved;
+    int genotypesSaved;
+    bool saveData;
 
-// };
+};

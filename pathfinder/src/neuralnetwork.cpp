@@ -26,22 +26,28 @@ double Neuron::transferFunctionDerivative(double x)
 {
     return 1 - x*x;
 }
-
+void Neuron::modifyWeight(vector<double> newWeights)
+{
+    for(int i = 0; i < m_outputWeights.size(); i++)
+    {
+        m_outputWeights[i].weight = newWeights[i];
+    }
+}
 
 //----------------------------------------------------------------------------------------------------------------------------------
 NeuralNet::NeuralNet(const vector<unsigned> &topology)
-
 {
     unsigned numLayers = topology.size();
     for(unsigned layerNum = 0; layerNum < numLayers; layerNum++)
     {
         m_layers.push_back(Layer());
+        int neuronCount = topology[layerNum];
         unsigned numOutputs = layerNum == topology.size()-1 ? 0 : topology[layerNum+1];
         for(unsigned neuronNum = 0; neuronNum <= topology[layerNum]; neuronNum++)
         {
-            weightCount++;
             m_layers.back().push_back(Neuron(numOutputs, neuronNum));
         }
+        weightCount += layerNum == topology.size()-1 ? 0 : (topology[layerNum]+1)*numOutputs;
     }
 }
 void NeuralNet::feedForward(const vector<double> &inputVals)
@@ -64,25 +70,55 @@ void NeuralNet::getResults(vector<double> &resultVals) const{
     for(unsigned n = 0; n < m_layers.back().size() -1; n++){
         resultVals.push_back(m_layers.back()[n].getOutputVal());
     }
-
-
 }
 
+void NeuralNet::GenotypeParamsToWeights(const vector<float> &population)
+{
+    int index = 0;
+    for(unsigned layerNum = 0; layerNum < m_layers.size(); layerNum++)
+    {
+        unsigned numOutputs = layerNum == m_layers.size()-1 ? 0 : m_layers[layerNum+1].size();
+        for(unsigned neuronNum = 0; neuronNum <= m_layers[layerNum].size(); neuronNum++)
+        {
+            vector<double> newWeights;
+            for(int i = 0; i < numOutputs; i++)
+            {
+                newWeights.push_back(population[index]);
+                index++;
+            }
+            m_layers[layerNum][neuronNum].modifyWeight(newWeights);
+        }
+    }
+}
+
+
+VehicleState NeuralNet::processResults(Vehicle* vehicle, VehicleState state, const vector<double> &resultVals)
+{
+    Steer steer = Straight;
+    if(resultVals[0] < .33)
+    {
+        steer = Left;
+    }
+    else if(resultVals[0 < .66])
+    {
+        steer = Right;
+    }
+    Gear gear = ( resultVals[1] > .5f) ? Forward : Backward;
+    return vehicle->getNextState(state, steer, gear, resultVals[2]);
+}
 vector<VehicleState> NeuralNet::run(Grid* grid, Vehicle* vehicle, VehicleState startPos, VehicleState endPos)
 {
     vector<VehicleState> path;
     VehicleState currentPos = startPos; 
     path.push_back(currentPos);
-
+    vector<vector<int>> m = grid->returnRawMap();
     while(grid->isSafe(currentPos, 1.5) || areEquivalentStates(currentPos, endPos))
     {
-        vector<double> inputs = vehicle->getDistanceFromObstacles(grid->returnRawMap(), currentPos); // get raw grid map
+        vector<double> inputs = vehicle->getDistanceFromObstacles(m, currentPos);
         feedForward(inputs);
         vector<double> results;
         getResults(results);
-        //steer and gear here
-        //currentPos = vehicle->current_path(currentPos, results[0], results[1], results[2]);
-        path.push_back(currentPos);
+        path.push_back(processResults(vehicle, currentPos, results));
     }
     return path;
 }
