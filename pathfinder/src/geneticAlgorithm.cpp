@@ -68,31 +68,34 @@ void GeneticAlgorithm::evaluation()
         agents.push_back(Agent(currentPopulation[i], topology, state, costMap));
     }
     int vehiclesCrashed = 0;
-    //while(vehiclesCrashed < currentPopulation.size())
-    //{
-        vector<vector<int>> map = grid->returnRawMap();
-        for(int r = 0; r < map.size(); r++)
-        {
-            for(int c = 0; c < map[r].size(); c++)
-            {
-                bool found = false;
-                for(int a = 0; a < agents.size(); a++)
-                {
-                    if(r == (int)agents[a].vehicleState.posX && c == (int)agents[a].vehicleState.posY)
-                    {
-                        found = true;
-                        cout << a+ 10 << " ";
-                        break;
-                    }
-                }
-                if(!found)
-                {
-                    cout << map[r][c] << " ";
-                }
+    vector<vector<int>> map = grid->returnRawMap();
+    int amountOfMoves = 200;
+    int movesTaken = 0;
+    while(vehiclesCrashed < currentPopulation.size() && movesTaken < amountOfMoves)
+    {
+        movesTaken++;
+        // for(int r = 0; r < map.size(); r++)
+        // {
+        //     for(int c = 0; c < map[r].size(); c++)
+        //     {
+        //         bool found = false;
+        //         for(int a = 0; a < agents.size(); a++)
+        //         {
+        //             if(r == (int)agents[a].vehicleState.posX && c == (int)agents[a].vehicleState.posY)
+        //             {
+        //                 found = true;
+        //                 cout << a+ 10 << " ";
+        //                 break;
+        //             }
+        //         }
+        //         if(!found)
+        //         {
+        //             cout << map[r][c] << " ";
+        //         }
                 
-            }
-            cout << endl;
-        }
+        //     }
+        //     cout << endl;
+        // }
         for(int i = 0; i < agents.size(); i++)
         {
             if(agents[i].hasCrashed)
@@ -113,7 +116,7 @@ void GeneticAlgorithm::evaluation()
                 continue;
             }
             
-            agents[i].update(mapGenPtr->getMap());
+            agents[i].update(map);
             float startDist = agents[i].costMap[start[i][0]][start[i][1]];
             float currentDist = agents[i].costMap[agents[i].vehicleState.posX][agents[i].vehicleState.posY];
             currentPopulation[i].eval = (startDist - currentDist) / startDist;
@@ -133,10 +136,10 @@ void GeneticAlgorithm::evaluation()
             }
             cout << "AGENT " << i << ": " << agents[i].vehicleState.posX << ", " << agents[i].vehicleState.posY << ", " 
             << agents[i].vehicleState.ori*180/M_PI << ", " << s << ", " <<  g << ", " << currentPopulation[i].eval << endl;
-        //}
-        cout << endl;
+        }
+        cout << "-----------------------" << GenerationCount << endl;
     }
-    //evaluationFinished();
+    evaluationFinished();
 }
 void GeneticAlgorithm::evaluationFinished()
 {

@@ -113,7 +113,8 @@ vector<double> Vehicle::getDistanceFromObstacles(vector<vector<int>> m, VehicleS
                 tempX += slopes[i][1]/(dist*2);
             }
             //cout << tempX << " " << tempY << endl;
-            if(tempX >= 50 || tempY >= 50 || tempX < 0 || tempY < 0){
+            if(tempX >= 55 || tempY >= 55 || tempX < 0 || tempY < 0){
+                cout << "hi " << endl;
                 distances.push_back(1);
                 break;
             }
