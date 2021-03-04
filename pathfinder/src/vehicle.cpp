@@ -124,3 +124,8 @@ vector<double> Vehicle::getDistanceFromObstacles(vector<vector<int>> m, VehicleS
     }
     return distances;
 }
+
+bool Vehicle::areEquivalentStates(VehicleState comp, VehicleState other)
+{
+    return comp.posX == other.posX && comp.posY ==  other.posY && comp.ori == other.ori && comp.gear == other.gear;
+}

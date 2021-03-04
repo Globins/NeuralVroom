@@ -16,6 +16,7 @@ public:
     VehicleState getNextState(VehicleState current, Steer steer, Gear gear, float delta_time);
     //MAP DETECTION
     vector<double> getDistanceFromObstacles(vector<vector<int>> m, VehicleState currentState);
+    bool areEquivalentStates(VehicleState comp, VehicleState other);
 private:
     vector<Coordinates3D> getSurroundingCoords(Coordinates3D currentPos, float dist);
     vector<vector<float>> getSlopes(Coordinates3D start, vector<Coordinates3D> surroundingCoords);

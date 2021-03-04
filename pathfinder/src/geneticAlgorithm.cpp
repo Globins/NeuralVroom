@@ -77,13 +77,19 @@ void GeneticAlgorithm::evaluation()
                 cout << "AGENT " << i << ": CRASHED" << endl;
                 continue;
             }
-            else if(!grid->isSafe(agents[i].vehicleState, 1.5))
+            else if(!grid->isSafe(agents[i].vehicleState, .5))
             {
                 agents[i].hasCrashed = true;
                 vehiclesCrashed++;
                 cout << "AGENT " << i << ": CRASHED" << endl;
                 continue;
             }
+            else if(agents[i].vehicleStatus.areEquivalentStates(agents[i].vehicleState, VehicleState{end[i][0], end[i][1], deg2rad(end[i][2]), Forward, Straight}))
+            {
+                cout << "AGENT " << i << ": SUCCEDED" << endl;
+                continue;
+            }
+            
             agents[i].update(mapGenPtr->getMap());
             float startDist = agents[i].costMap[start[i][0]][start[i][1]];
             float currentDist = agents[i].costMap[agents[i].vehicleState.posX][agents[i].vehicleState.posY];
@@ -92,7 +98,7 @@ void GeneticAlgorithm::evaluation()
         }
         cout << endl;
     }
-    //evaluationFinished();
+    evaluationFinished();
 }
 void GeneticAlgorithm::evaluationFinished()
 {
@@ -101,15 +107,16 @@ void GeneticAlgorithm::evaluationFinished()
     {
 
     }
-    // if(GenerationCount < trainAmount)
-    // {
-    //     vector<Genotype> intermediatePop = selection();
-    //     vector<Genotype> newPopulation = recombination(intermediatePop, populationSize);
-    //     mutation(newPopulation);
-    //     currentPopulation = newPopulation;
-    //     GenerationCount++;
-    //     evaluation();
-    // }
+    if(GenerationCount < trainAmount)
+    {
+        vector<Genotype> intermediatePop = selection();
+        cout << intermediatePop.size() << endl;
+        vector<Genotype> newPopulation = recombination(intermediatePop, populationSize);
+        mutation(newPopulation);
+        currentPopulation = newPopulation;
+        GenerationCount++;
+        evaluation();
+    }
 }
 void GeneticAlgorithm::fitnessCalculation()
 {
@@ -123,34 +130,15 @@ void GeneticAlgorithm::fitnessCalculation()
     float averageEval = overallEval / populationSize;
     for(Genotype &geno : currentPopulation)
     {
-        geno.fitness = overallEval / populationSize;
+        geno.fitness = geno.eval / overallEval;
     }
 }
 vector<Genotype> GeneticAlgorithm::selection()
 {
     vector<Genotype> intermediatePopulation;
-    for(Genotype &geno : currentPopulation)
-    {
-        if(geno.fitness < 1)
-        {
-            break;
-        }
-        else
-        {
-            for(int i = 0; i < (int)geno.fitness; i++)
-            {
-                intermediatePopulation.push_back(Genotype(geno.params));
-            }
-        }
-    }
-    for(Genotype &geno : currentPopulation)
-    {
-        float remainder = geno.fitness - (int)geno.fitness;
-        if(((double) rand() / (RAND_MAX)) < remainder)
-        {
-            intermediatePopulation.push_back(Genotype(geno.params));
-        }
-    }
+    intermediatePopulation.push_back(currentPopulation[0]);
+    intermediatePopulation.push_back(currentPopulation[1]);
+    intermediatePopulation.push_back(currentPopulation[2]);
 
     return intermediatePopulation;
 }
