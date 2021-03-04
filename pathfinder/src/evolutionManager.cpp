@@ -12,6 +12,7 @@ NeuralNet EvolutionManager::train(const vector<unsigned> &topology, const int tr
         writeResultsToFile(ga.getPopulation());
     }
     cout <<"DONE" << endl;
+    cout << "FINAL EVAL: " << ga.getPopulation()[0].eval << endl;
     nn.GenotypeParamsToWeights(ga.getPopulation()[0].params);
     return nn;
 }

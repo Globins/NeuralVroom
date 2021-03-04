@@ -68,8 +68,31 @@ void GeneticAlgorithm::evaluation()
         agents.push_back(Agent(currentPopulation[i], topology, state, costMap));
     }
     int vehiclesCrashed = 0;
-    while(vehiclesCrashed < currentPopulation.size())
-    {
+    //while(vehiclesCrashed < currentPopulation.size())
+    //{
+        vector<vector<int>> map = grid->returnRawMap();
+        for(int r = 0; r < map.size(); r++)
+        {
+            for(int c = 0; c < map[r].size(); c++)
+            {
+                bool found = false;
+                for(int a = 0; a < agents.size(); a++)
+                {
+                    if(r == (int)agents[a].vehicleState.posX && c == (int)agents[a].vehicleState.posY)
+                    {
+                        found = true;
+                        cout << a+ 10 << " ";
+                        break;
+                    }
+                }
+                if(!found)
+                {
+                    cout << map[r][c] << " ";
+                }
+                
+            }
+            cout << endl;
+        }
         for(int i = 0; i < agents.size(); i++)
         {
             if(agents[i].hasCrashed)
@@ -94,23 +117,37 @@ void GeneticAlgorithm::evaluation()
             float startDist = agents[i].costMap[start[i][0]][start[i][1]];
             float currentDist = agents[i].costMap[agents[i].vehicleState.posX][agents[i].vehicleState.posY];
             currentPopulation[i].eval = (startDist - currentDist) / startDist;
-            cout << "AGENT " << i << ": " << agents[i].vehicleState.posX << ", " << agents[i].vehicleState.posY << ", " << currentPopulation[i].eval << endl;
-        }
+            string s = "S";
+            if(agents[i].vehicleState.steer == Left)
+            {
+                s = "L";
+            }
+            else if(agents[i].vehicleState.steer == Right)
+            {
+                s = "R";
+            }
+            string g = "F";
+            if(agents[i].vehicleState.gear == Backward)
+            {
+                g = "B";
+            }
+            cout << "AGENT " << i << ": " << agents[i].vehicleState.posX << ", " << agents[i].vehicleState.posY << ", " 
+            << agents[i].vehicleState.ori*180/M_PI << ", " << s << ", " <<  g << ", " << currentPopulation[i].eval << endl;
+        //}
         cout << endl;
     }
-    evaluationFinished();
+    //evaluationFinished();
 }
 void GeneticAlgorithm::evaluationFinished()
 {
     fitnessCalculation();
     if(sortPopulation)
     {
-
+        std::sort(currentPopulation.begin(), currentPopulation.end());
     }
     if(GenerationCount < trainAmount)
     {
         vector<Genotype> intermediatePop = selection();
-        cout << intermediatePop.size() << endl;
         vector<Genotype> newPopulation = recombination(intermediatePop, populationSize);
         mutation(newPopulation);
         currentPopulation = newPopulation;

@@ -112,16 +112,23 @@ vector<double> Vehicle::getDistanceFromObstacles(vector<vector<int>> m, VehicleS
             else{
                 tempX += slopes[i][1]/(dist*2);
             }
+            //cout << tempX << " " << tempY << endl;
             if(tempX >= 50 || tempY >= 50 || tempX < 0 || tempY < 0){
                 distances.push_back(1);
                 break;
             }
         }
+        //cout << endl;
         if(distances.size() != i+1){
             distances.push_back(0);
             
         }
     }
+    for(double dist : distances)
+    {
+        cout << dist << " ";
+    }
+    cout << endl;
     return distances;
 }
 

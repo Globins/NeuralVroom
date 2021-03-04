@@ -14,14 +14,9 @@ public:
     float eval;
     float fitness;
     vector<float> params;
-    
-};
-
-struct GENOcomparator
-{
-    bool operator()(const Genotype* a, const Genotype* b)
+    bool operator<(const Genotype& a)
     {
-        return a->fitness > b->fitness;
+        return fitness > a.fitness;
     }
 };
 

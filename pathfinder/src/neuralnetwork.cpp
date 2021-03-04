@@ -104,10 +104,6 @@ VehicleState NeuralNet::processResults(Vehicle* vehicle, VehicleState state, con
     }
     Gear gear = ( resultVals[1] < .5f) ? Forward : Backward;
     float time = 1;
-    if(resultVals[2] > .05)
-    {
-        time = resultVals[2];
-    }
     VehicleState nextMove = vehicle->getNextState(state, steer, gear, time);
     return vehicle->getNextState(state, steer, gear, time);
 }
