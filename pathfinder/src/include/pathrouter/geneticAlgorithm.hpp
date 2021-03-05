@@ -3,6 +3,7 @@
 #include "../mapGenerator.hpp"
 #include "../vehicle.hpp"
 #include "../pathrouter/neuralnetwork.hpp"
+#include <windows.h>
 class Genotype
 {
 public:
@@ -40,6 +41,7 @@ class GeneticAlgorithm
         void evaluation();
         vector<Genotype> getPopulation();
         void printPopulation();
+        void printMapWithAgents(vector<vector<int>> map, vector<Agent> agents, VehicleState end);
         
     private:
         void initPopulation();

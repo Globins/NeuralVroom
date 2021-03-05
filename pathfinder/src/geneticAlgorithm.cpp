@@ -72,61 +72,47 @@ void GeneticAlgorithm::evaluation()
     
     for(int i = 0; i < currentPopulation.size(); i++)
     {
-        VehicleState state = VehicleState{start[i][0], start[i][1], deg2rad(start[i][2]), Forward, Straight};
-        vector<vector<float>> costMap = grid->nonHolonomicRelaxedCostMap(VehicleState{end[i][0], end[i][1], deg2rad(end[i][2]), Forward, Straight});
+        VehicleState state = VehicleState{start[0][0], start[0][1], deg2rad(start[0][2]), Forward, Straight};
+        vector<vector<float>> costMap = grid->nonHolonomicRelaxedCostMap(VehicleState{end[0][0], end[0][1], deg2rad(end[0][2]), Forward, Straight});
         agents.push_back(Agent(currentPopulation[i], topology, state, costMap));
     }
     int vehiclesCrashed = 0;
     vector<vector<int>> map = grid->returnRawMap();
     int amountOfMoves = 200;
     int movesTaken = 0;
-    while(vehiclesCrashed < currentPopulation.size() && movesTaken < amountOfMoves)
+    if(GenerationCount == 1)
     {
-        movesTaken++;
-        // for(int r = 0; r < map.size(); r++)
-        // {
-        //     for(int c = 0; c < map[r].size(); c++)
-        //     {
-        //         bool found = false;
-        //         for(int a = 0; a < agents.size(); a++)
-        //         {
-        //             if(r == (int)agents[a].vehicleState.posX && c == (int)agents[a].vehicleState.posY)
-        //             {
-        //                 found = true;
-        //                 cout << a+ 10 << " ";
-        //                 break;
-        //             }
-        //         }
-        //         if(!found)
-        //         {
-        //             cout << map[r][c] << " ";
-        //         }
-                
-        //     }
-        //     cout << endl;
-        // }
-        for(int i = 0; i < agents.size(); i++)
-        {
-            agents[i].update(map);
-            if(agents[i].hasCrashed)
-            {
-                cout << "AGENT " << i << ": CRASHED" << endl;
-                continue;
-            }
-            else if(!grid->isSafe(agents[i].vehicleState, .5))
-            {
-                agents[i].hasCrashed = true;
-                vehiclesCrashed++;
-                cout << "AGENT " << i << ": CRASHED" << endl;
-                continue;
-            }
-            else if(agents[i].vehicleStatus.areEquivalentStates(agents[i].vehicleState, VehicleState{end[i][0], end[i][1], deg2rad(end[i][2]), Forward, Straight}))
-            {
-                cout << "AGENT " << i << ": SUCCEDED" << endl;
-                continue;
-            }
-            float startDist = agents[i].costMap[start[i][0]][start[i][1]];
+        printMapWithAgents(map, agents, VehicleState{end[0][0], end[0][1], deg2rad(end[0][2]), Forward, Straight});
+    }
+    
+     while(vehiclesCrashed < currentPopulation.size() && movesTaken < amountOfMoves)
+     {
+         movesTaken++;
+         for(int i = 0; i < agents.size(); i++)
+         {
+             agents[i].update(map);
+             if(agents[i].hasCrashed)
+             {
+                 //cout << "AGENT " << i << ": CRASHED" << endl;
+                 continue;
+             }
+             else if(!grid->isSafe(agents[i].vehicleState, .5))
+             {
+                 agents[i].hasCrashed = true;
+                 vehiclesCrashed++;
+                 //currentPopulation[i].eval -= .5;
+                 //cout << "AGENT " << i << ": CRASHED" << endl;
+                 continue;
+             }
+             else if(agents[i].vehicleStatus.areEquivalentStates(agents[i].vehicleState, VehicleState{end[i][0], end[i][1], deg2rad(end[i][2]), Forward, Straight}))
+             {
+                 cout << "AGENT " << i << ": SUCCEDED" << endl;
+                 //currentPopulation[i].eval = 1;
+                 continue;
+             }
+            float startDist = agents[i].costMap[start[0][0]][start[0][1]];
             float currentDist = agents[i].costMap[agents[i].vehicleState.posX][agents[i].vehicleState.posY];
+            //cout << "START DIST: " << startDist << " CURRENT: " << currentDist << endl; 
             currentPopulation[i].eval = (startDist - currentDist) / startDist;
             string s = "S";
             if(agents[i].vehicleState.steer == Left)
@@ -142,11 +128,16 @@ void GeneticAlgorithm::evaluation()
             {
                 g = "B";
             }
-            cout << "START " << i << ": " << start[i][0] << ", " << start[i][1] << ", " << start[i][2] << endl;
-            cout << "AGENT " << i << ": " << agents[i].vehicleState.posX << ", " << agents[i].vehicleState.posY << ", " 
-            << agents[i].vehicleState.ori*180/M_PI << ", " << s << ", " <<  g << ", " << currentPopulation[i].eval << endl;
-        }
-        //cout << "-----------------------" << GenerationCount << endl;
+            // cout << "START " << i << ": " << start[i][0] << ", " << start[i][1] << ", " << start[i][2] << endl;
+            // cout << "AGENT " << i << ": " << agents[i].vehicleState.posX << ", " << agents[i].vehicleState.posY << ", " 
+            // << agents[i].vehicleState.ori*180/M_PI << ", " << s << ", " <<  g << ", " << currentPopulation[i].eval << endl;
+         }
+         //printMapWithAgents(map, agents);
+            cout <<  GenerationCount << endl;
+     }
+    if(GenerationCount == trainAmount)
+    {
+        printMapWithAgents(map, agents, VehicleState{end[0][0], end[0][1], deg2rad(end[0][2]), Forward, Straight});
     }
     evaluationFinished();
 }
@@ -204,13 +195,12 @@ vector<Genotype> GeneticAlgorithm::recombination(vector<Genotype> intermediatePo
     newPopulation.push_back(intermediatePop[1]);
     while(newPopulation.size() < newPopSize)
     {
-        int rand1 = rand() % newPopSize;
+        int rand1 = rand() % intermediatePop.size();
         int rand2 = 0;
         do
         {
-            rand2 = rand() % newPopSize;
+            rand2 = rand() % intermediatePop.size();
         } while (rand1 == rand2);
-        
         vector<Genotype> offspringOneAndTwo = completeCrossover(intermediatePop[rand1], intermediatePop[rand2], defaultCrossSwapProb);
         newPopulation.push_back(offspringOneAndTwo[0]);
         if(newPopulation.size() < newPopSize)
@@ -276,3 +266,59 @@ void GeneticAlgorithm::printPopulation()
     }
     cout << endl << endl;
 }
+
+void GeneticAlgorithm::printMapWithAgents(vector<vector<int>> map, vector<Agent> agents, VehicleState end)
+{
+    HANDLE  hConsole;
+    hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+    for(int r = 0; r < map.size(); r++)
+    {
+        for(int c = 0; c < map[r].size(); c++)
+        {
+            bool found = false;
+            if(r == end.posX && c == end.posY)
+            {
+                SetConsoleTextAttribute(hConsole, 100);
+                cout << "X ";
+                SetConsoleTextAttribute(hConsole, 15);
+                continue;
+            }
+            for(int a = 0; a < agents.size(); a++)
+            {
+                SetConsoleTextAttribute(hConsole, 150);
+                if(r == (int)agents[a].vehicleState.posX && c == (int)agents[a].vehicleState.posY)
+                {
+                    found = true;
+                    if(agents[a].vehicleState.ori > 1.75*M_PI && agents[a].vehicleState.ori < M_PI_4)
+                    {
+                        cout << ">";
+                    }
+                    else if(agents[a].vehicleState.ori > M_PI_4 && agents[a].vehicleState.ori < .75*M_PI)
+                    {
+                        cout << "^";
+                    }
+                    else if(agents[a].vehicleState.ori > .75*M_PI && agents[a].vehicleState.ori < 1.25*M_PI)
+                    {
+                        cout << "<";
+                    }
+                    else
+                    {
+                        cout << "v";
+                    }
+                    SetConsoleTextAttribute(hConsole, 15);
+                    cout << " ";
+                    break;
+                }
+                SetConsoleTextAttribute(hConsole, 15);
+            }
+            SetConsoleTextAttribute(hConsole, 15);
+            if(!found)
+            {
+                cout << map[r][c] << " ";
+            }
+            
+        }
+        cout << endl;
+    }  
+}
+

@@ -4,8 +4,7 @@ NeuralNet EvolutionManager::train(const vector<unsigned> &topology, const int tr
 {
     this->saveData = saveData;
     NeuralNet nn = NeuralNet(topology);
-    GeneticAlgorithm ga = GeneticAlgorithm(nn.weightCount, 3, topology, m);
-    genotypesSaved = 0;
+    GeneticAlgorithm ga = GeneticAlgorithm(nn.weightCount, m.getStartPoints().size(), topology, m);
     ga.start(trainAmount);
     if(saveData)
     {
