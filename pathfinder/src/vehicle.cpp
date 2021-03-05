@@ -37,6 +37,14 @@ VehicleState Vehicle::getNextState(VehicleState current, Steer steer, Gear gear,
     current.posX += correctedPos.x;
     current.posY += correctedPos.y;
     current.ori += angle;
+    if (current.ori >= 2*M_PI)
+    {
+        current.ori -= 2*M_PI;
+    }
+    else if(current.ori < 0)
+    {
+        current.ori += 2*M_PI;
+    }
     current.steer = steer;
     current.gear = gear;
     return current;
@@ -89,13 +97,17 @@ vector<vector<float>> Vehicle::getSlopes(Coordinates3D start, vector<Coordinates
 vector<double> Vehicle::getDistanceFromObstacles(vector<vector<int>> m, VehicleState currentState){
     float dist = 3.1;
     Coordinates3D currentPos = Coordinates3D{currentState.posX, currentState.posY, currentState.ori};
+    cout << "hi" << endl;
     vector<Coordinates3D> surroundingCoords = getSurroundingCoords(currentPos, dist);
+    cout << "hi2" << endl;
     vector<vector<float>> slopes = getSlopes(currentPos, surroundingCoords);
+    cout << "hi3" << endl;
     vector<double> distances;
     for(int i = 0; i < slopes.size(); i++){
         float tempX = currentPos.x;
         float tempY = currentPos.y;
         for(int j = 0; j < dist*2; j++){
+            cout << tempY << " " << tempX << endl;
             if(m[roundf(tempY)][roundf(tempX)] == 1){
                 distances.push_back( (dist*2 - j)/(dist*2)  );
                 break;
@@ -112,24 +124,17 @@ vector<double> Vehicle::getDistanceFromObstacles(vector<vector<int>> m, VehicleS
             else{
                 tempX += slopes[i][1]/(dist*2);
             }
-            //cout << tempX << " " << tempY << endl;
             if(tempX >= 55 || tempY >= 55 || tempX < 0 || tempY < 0){
-                cout << "hi " << endl;
                 distances.push_back(1);
                 break;
             }
         }
-        //cout << endl;
         if(distances.size() != i+1){
             distances.push_back(0);
             
         }
+        cout << i << endl;
     }
-    for(double dist : distances)
-    {
-        cout << dist << " ";
-    }
-    cout << endl;
     return distances;
 }
 

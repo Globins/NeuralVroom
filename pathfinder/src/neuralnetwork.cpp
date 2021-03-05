@@ -16,7 +16,7 @@ void Neuron::feedForward(const Layer &prevLayer)
     {
         sum += prevLayer[n].getOutputVal() * prevLayer[n].m_outputWeights[m_myIndex].weight;
     }
-    m_outputVal = Neuron::transferFunction(sum);
+    m_outputVal = transferFunction(sum);
 }
 double Neuron::transferFunction(double x)
 {
@@ -98,14 +98,13 @@ VehicleState NeuralNet::processResults(Vehicle* vehicle, VehicleState state, con
     {
         steer = Left;
     }
-    else if(resultVals[0] > .66)
+    else if(resultVals[0] < -.33)
     {
         steer = Right;
     }
-    Gear gear = ( resultVals[1] < .5f) ? Forward : Backward;
+    Gear gear = ( resultVals[1] > 0) ? Forward : Backward;
     float time = 1;
-    VehicleState nextMove = vehicle->getNextState(state, steer, gear, time);
-    return vehicle->getNextState(state, steer, gear, time);
+    return vehicle->getNextState(state, steer, Forward, time);
 }
 vector<VehicleState> NeuralNet::run(Grid* grid, Vehicle* vehicle, VehicleState startPos, VehicleState endPos)
 {

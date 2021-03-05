@@ -23,11 +23,23 @@ Agent::Agent(Genotype genotype, vector<unsigned> topology, VehicleState state, v
 }
 void Agent::update(vector<vector<int>> m)
 {
-    vector<double> sensorInfo = vehicleStatus.getDistanceFromObstacles(m, vehicleState);
-    nn.feedForward(sensorInfo);
-    vector<double> results;
-    nn.getResults(results);
-    vehicleState = nn.processResults(&vehicleStatus, vehicleState, results);
+    cout << "B4" << endl;
+    if(vehicleState.posX < m.size() && vehicleState.posY < m[0].size() && vehicleState.posX >= 0 && vehicleState.posY >= 0)
+    {
+        cout << vehicleState.posX << ", " << vehicleState.posY << endl;
+        vector<double> sensorInfo = vehicleStatus.getDistanceFromObstacles(m, vehicleState);
+        cout << "AF" << endl;
+        nn.feedForward(sensorInfo);
+        vector<double> results;
+        nn.getResults(results);
+        // for(double res : results)
+        // {
+        //     cout << res << " ";
+        // }
+        // cout << endl;
+        vehicleState = nn.processResults(&vehicleStatus, vehicleState, results);
+    }
+
 }
 //----------------------------------------------------------------------------------------------------------------------------------
 GeneticAlgorithm::GeneticAlgorithm(int genotypeParamCount, int populationSize, const vector<unsigned> &topology, mapGenerator &m)
@@ -98,6 +110,7 @@ void GeneticAlgorithm::evaluation()
         // }
         for(int i = 0; i < agents.size(); i++)
         {
+            agents[i].update(map);
             if(agents[i].hasCrashed)
             {
                 cout << "AGENT " << i << ": CRASHED" << endl;
@@ -115,8 +128,6 @@ void GeneticAlgorithm::evaluation()
                 cout << "AGENT " << i << ": SUCCEDED" << endl;
                 continue;
             }
-            
-            agents[i].update(map);
             float startDist = agents[i].costMap[start[i][0]][start[i][1]];
             float currentDist = agents[i].costMap[agents[i].vehicleState.posX][agents[i].vehicleState.posY];
             currentPopulation[i].eval = (startDist - currentDist) / startDist;
@@ -134,6 +145,7 @@ void GeneticAlgorithm::evaluation()
             {
                 g = "B";
             }
+            cout << "START " << i << ": " << start[i][0] << ", " << start[i][1] << ", " << start[i][2] << endl;
             cout << "AGENT " << i << ": " << agents[i].vehicleState.posX << ", " << agents[i].vehicleState.posY << ", " 
             << agents[i].vehicleState.ori*180/M_PI << ", " << s << ", " <<  g << ", " << currentPopulation[i].eval << endl;
         }
