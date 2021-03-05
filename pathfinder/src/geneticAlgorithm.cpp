@@ -181,7 +181,7 @@ void GeneticAlgorithm::fitnessCalculation()
     float averageEval = overallEval / populationSize;
     for(Genotype &geno : currentPopulation)
     {
-        geno.fitness = geno.eval / overallEval;
+        geno.fitness = geno.eval / averageEval;
     }
 }
 vector<Genotype> GeneticAlgorithm::selection()
