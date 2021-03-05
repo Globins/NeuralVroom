@@ -146,7 +146,7 @@ void GeneticAlgorithm::evaluation()
             cout << "AGENT " << i << ": " << agents[i].vehicleState.posX << ", " << agents[i].vehicleState.posY << ", " 
             << agents[i].vehicleState.ori*180/M_PI << ", " << s << ", " <<  g << ", " << currentPopulation[i].eval << endl;
         }
-        cout << "-----------------------" << GenerationCount << endl;
+        //cout << "-----------------------" << GenerationCount << endl;
     }
     evaluationFinished();
 }
@@ -162,7 +162,9 @@ void GeneticAlgorithm::evaluationFinished()
         vector<Genotype> intermediatePop = selection();
         vector<Genotype> newPopulation = recombination(intermediatePop, populationSize);
         mutation(newPopulation);
+        //printPopulation();
         currentPopulation = newPopulation;
+        //printPopulation();
         GenerationCount++;
         evaluation();
     }
@@ -252,7 +254,7 @@ void GeneticAlgorithm::mutateGenotype(Genotype &genotype, float mutationProb, fl
 {
     for(float param : genotype.params)
     {
-        if(((double) rand() / (RAND_MAX)) < mutationProb*100)
+        if(((double) rand() / (RAND_MAX)) < mutationProb)
         {
             param += float(((double) rand() / (RAND_MAX)) * mutationAmount* 2 - mutationAmount);
         }
@@ -270,6 +272,7 @@ void GeneticAlgorithm::printPopulation()
         {
             cout << param << " ";
         }
-        cout << endl;
+        cout << endl << endl;;
     }
+    cout << endl << endl;
 }

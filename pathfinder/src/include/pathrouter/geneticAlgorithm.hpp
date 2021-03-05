@@ -56,7 +56,7 @@ class GeneticAlgorithm
         float defaultCrossSwapProb = .6;
         float defaultMutationProb = .3;
         float defaultMutationAmount = 2;
-        float defaultMutationPerc = 15;
+        float defaultMutationPerc = .15;
         
         mapGenerator* mapGenPtr;
         vector<Agent> agents;
