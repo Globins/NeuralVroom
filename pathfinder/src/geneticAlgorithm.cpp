@@ -23,12 +23,9 @@ Agent::Agent(Genotype genotype, vector<unsigned> topology, VehicleState state, v
 }
 void Agent::update(vector<vector<int>> m)
 {
-    cout << "B4" << endl;
     if(vehicleState.posX < m.size() && vehicleState.posY < m[0].size() && vehicleState.posX >= 0 && vehicleState.posY >= 0)
     {
-        cout << vehicleState.posX << ", " << vehicleState.posY << endl;
         vector<double> sensorInfo = vehicleStatus.getDistanceFromObstacles(m, vehicleState);
-        cout << "AF" << endl;
         nn.feedForward(sensorInfo);
         vector<double> results;
         nn.getResults(results);
