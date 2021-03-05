@@ -188,7 +188,7 @@ int main(){
         //run evo code if it does not
     mapGenerator mTest = mapGenerator(50, 50, vector<int>{3,3}, 7, 24);
     EvolutionManager trainer = EvolutionManager();
-    NeuralNet nn = trainer.train({24, 18, 8, 4, 2}, 1000, false, mTest);
+    NeuralNet nn = trainer.train({24, 18, 8, 4, 2}, 1500, true, mTest);
     mapGenerator m = mapGenerator(50, 50, vector<int>{3,3}, 7, 0);
     Grid* grid = m.getGrid();
 

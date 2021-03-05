@@ -57,9 +57,18 @@ void GeneticAlgorithm::start(const int trainAmount)
 
 void GeneticAlgorithm::initPopulation()
 {
+    bool load = false;
     for(Genotype &geo : currentPopulation)
     {
-        geo.setRandomParams(defaultInitParamMin, defaultInitParamMax);
+        if(load)
+        {
+            ifstream weights("weights.txt");
+        }
+        else
+        {
+            geo.setRandomParams(defaultInitParamMin, defaultInitParamMax);
+        }
+        
     }
 }
 
@@ -78,7 +87,7 @@ void GeneticAlgorithm::evaluation()
     }
     int vehiclesCrashed = 0;
     vector<vector<int>> map = grid->returnRawMap();
-    int amountOfMoves = 200;
+    int amountOfMoves = 1000;
     int movesTaken = 0;
     if(GenerationCount == 1)
     {
@@ -133,7 +142,7 @@ void GeneticAlgorithm::evaluation()
             // << agents[i].vehicleState.ori*180/M_PI << ", " << s << ", " <<  g << ", " << currentPopulation[i].eval << endl;
          }
          //printMapWithAgents(map, agents);
-            cout <<  GenerationCount << endl;
+        cout <<  GenerationCount << endl;
      }
     if(GenerationCount == trainAmount)
     {
@@ -291,19 +300,19 @@ void GeneticAlgorithm::printMapWithAgents(vector<vector<int>> map, vector<Agent>
                     found = true;
                     if(agents[a].vehicleState.ori > 1.75*M_PI && agents[a].vehicleState.ori < M_PI_4)
                     {
-                        cout << ">";
+                        cout << ">      ";
                     }
                     else if(agents[a].vehicleState.ori > M_PI_4 && agents[a].vehicleState.ori < .75*M_PI)
                     {
-                        cout << "^";
+                        cout << "^         ";
                     }
                     else if(agents[a].vehicleState.ori > .75*M_PI && agents[a].vehicleState.ori < 1.25*M_PI)
                     {
-                        cout << "<";
+                        cout << "<           ";
                     }
                     else
                     {
-                        cout << "v";
+                        cout << "v            ";
                     }
                     SetConsoleTextAttribute(hConsole, 15);
                     cout << " ";

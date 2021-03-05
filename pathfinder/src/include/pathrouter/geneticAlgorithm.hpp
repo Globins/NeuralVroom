@@ -53,7 +53,7 @@ class GeneticAlgorithm
         vector<Genotype> completeCrossover(const Genotype &parent1, const Genotype &parent2, float swapChance);
         void mutateGenotype(Genotype &genotype, float mutationProb, float mutationAmount);
 
-        float defaultInitParamMin = -1;
+        float defaultInitParamMin = 0;
         float defaultInitParamMax = 1;
         float defaultCrossSwapProb = .6;
         float defaultMutationProb = .3;

@@ -94,15 +94,15 @@ void NeuralNet::GenotypeParamsToWeights(const vector<float> &population)
 VehicleState NeuralNet::processResults(Vehicle* vehicle, VehicleState state, const vector<double> &resultVals)
 {
     Steer steer = Straight;
-    if(resultVals[0] > .33)
+    if(resultVals[0] > .66)
     {
         steer = Left;
     }
-    else if(resultVals[0] < -.33)
+    else if(resultVals[0] > .33)
     {
         steer = Right;
     }
-    Gear gear = ( resultVals[1] > 0) ? Forward : Backward;
+    Gear gear = ( resultVals[1] > .5) ? Forward : Backward;
     float time = 1;
     return vehicle->getNextState(state, steer, Forward, time);
 }

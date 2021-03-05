@@ -9,6 +9,7 @@
 #include <stdlib.h>
 #include "globals.hpp"
 #include <iomanip> 
+#include <fstream>
 
 using namespace std;
 

@@ -21,5 +21,15 @@ NeuralNet EvolutionManager::train(const vector<unsigned> &topology, const int tr
 
 void EvolutionManager::writeResultsToFile(vector<Genotype> currentPop)
 {
-
+    ofstream weights;
+    weights.open("weights.txt");
+    for(Genotype geno : currentPop)
+    {
+        for(float param : geno.params)
+        {
+            weights << param << " ";
+        }
+        weights << "\n";
+    }
+    weights.close();
 }
